@@ -1,0 +1,7 @@
+report/*.aux
+report/*.log
+report/*.out
+report/*.pyg
+report/*.synctex.gz
+report/*.toc
+report/_minted-report
