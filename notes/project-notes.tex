@@ -20,5 +20,58 @@
 \chapter{Meeting Notes}
 
 
+\section{17/10/18}
+
+\begin{itemize}
+
+\item Discussed questions I had about Chapter 1 (Steganography) and Chapter 2 (Steganalysis) of the Advanced Security notes and about the 2008 paper.
+  \begin{itemize}
+
+  \item \textit{What is downsampling?} Shrinking
+
+  \item \textit{When you take a pictures on your phone, what happens?} Captures raw image, immediately compresses it as a JPEG, and discards the raw image
+
+  \item \textit{What determines a cover's ``source''?} Primarily the camera. The camera's ISO setting, in particular, is very important. The subject of the photos don't make much of a difference.
+
+  \item \textit{In JPEG compression, don't you lose some information when dividing the image into 8x8 pixel blocks?} No, the DCT is linear (i.e. 1-to-1 mapping from 8x8 blocks to coefficients)
+
+  \item \textit{Is a JPEG decompressed every time you view it on a computer?} Yes
+
+  \item \textit{When LSBR is used on RGB images, which bit(s) are changed?} Good question - it depends, but usually the LSBs of all three components (in sync)
+
+  \end{itemize}
+
+\item After embedding a payload, the original cover is destroyed. Otherwise, two nearly identical images would be floating around and Alice could easily be outed if someone got their hands on both versions.
+
+\end{itemize}
+
+
+\section{03/10/18}
+
+\begin{itemize}
+
+\item Discussed software to be used for embedding (J-UNIWARD), feature extraction (JRM), and detection (ensemble of linear classifiers)
+  \begin{itemize}
+  \item All the software is \href{http://dde.binghamton.edu/download/stego_algorithms/}{here}
+  \end{itemize}
+
+\item Server's IP: 163.1.88.150
+
+\item Amounts of payload to embed: $O(1)$, $O(\sqrt{n})$, $O(\sqrt{n} \log n)$, $O(n)$
+
+\item $m \sim \frac{\sqrt{DC}}{2} \log \frac{C}{D}$
+
+\item TIME EVERYTHING
+
+\item I will test new embedding and new detecting methods and I could also try old embedding and new detecting methods
+
+\item Total amount of space needed (assuming around 10,000 images are used):
+  \begin{itemize}
+  \item Images: $2MB \times 10000 \times 9 \approx 180GB$
+  \item Costs: $8B \times 5M \times 10000 \approx 400 GB$
+  \item Features: $170KB \times 10000 \times 9 \approx 17GB$
+  \end{itemize}
+
+\end{itemize}
 
 \end{document}
