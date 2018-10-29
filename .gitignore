@@ -1,3 +1,5 @@
+notes/*.synctex.gz
+
 report/*.aux
 report/*.log
 report/*.out
