@@ -15,6 +15,10 @@ dest_dir = 'size3072/'
 metadata_file = 'metadata.txt'
 
 def handle_image(name):
+  """
+  Convert image to grayscale, make it landscape (if it isn't already), and
+  put it in the destination directory.
+  """
   original_path = original_dir + name
   destination_path = dest_dir + name
 
@@ -29,6 +33,8 @@ def handle_image(name):
 start = time.time()
 
 with open(metadata_file, 'r') as metadata:
+  # Start reading from the fourth line since the first three have other
+  # information.
   for line in metadata.readlines()[3:]:
     values = line.rstrip().split()
     image_num = values[0]
