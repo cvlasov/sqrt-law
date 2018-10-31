@@ -19,10 +19,19 @@
 %-----------------------
 \chapter{Task Documentation}
 
+All timings mentioned here are approximate. The specific results can be found in Section \ref{sec:script-timings}.
+
+\section{Image Curation}
+
+\subsection{Initial Image Selection}
+
+The first step was selecting which images to use for the experiments. Flickr released a massive database of millions of images and we will use those taken by one user, referred to as \texttt{actor00003}. There are $13,349$ images taken by this user and they are on the server under \texttt{/array/vlasov/actor00003}. The largest image size in this directory is $3072\times2304$ pixels and information about all the images is in a file called \texttt{metadata.txt} in the same directory.
+
+I wrote a script called \texttt{initial\_curation.py} to do the initial image filtering. The script uses the metadata file to identify the images that are $3072\times2304$ pixels, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new subdirectory called \texttt{size3072}. The script took just under 20 minutes to run and 9539 grayscale, $3072\times2304$ pixel landscape images were produced.
+
 
 %-----------------------
 \chapter{Meeting Notes}
-
 
 \section{24/10/18}
 
@@ -222,6 +231,7 @@
 
 
 \section{Script Timings}
+\label{sec:script-timings}
 
 \begin{itemize}
 
