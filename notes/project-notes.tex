@@ -1,6 +1,10 @@
 \documentclass[11pt,a4paper]{report}
 
+\usepackage{amsmath}
+\usepackage{graphicx}
 \usepackage{hyperref}
+
+\graphicspath{{images/}}
 
 \begin{document}
 
@@ -20,9 +24,129 @@
 \chapter{Meeting Notes}
 
 
+\section{24/10/18}
+
+\begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Read Chapter 3 of the Advanced Security notes on steganography
+  \item Wrote a script (\texttt{initial\_curation.py}) to find all the largest images in the \texttt{actor00003} directory and then make them all grayscale and landscape
+    \begin{itemize}
+    \item Wasn't quite working due to ``\texttt{Empty input file}'' error when performing multiple \texttt{jpegtran} operations
+    \end{itemize}
+  \end{itemize}
+
+\item Action plan:
+  \begin{enumerate}
+
+  \item Calculate image sizes
+    \begin{itemize}
+    \item Preserve the 4:3 aspect ratio, not because we have to but because we can and it means we can keep things as similar as possible
+
+    \item The largest image size we'll use is $3072\times2304$ since that's the size of the largest \texttt{actor00003} images.
+
+    \item The smallest size will be $320\times240$ since that's a relatively common image size (and it has a 4:3 aspect ratio)
+
+    \item The short-edge dimensions will be computed by hand by calculating $240x$ (where $x=\sqrt{1}, \sqrt{2},...,\sqrt{10}$) and then rounding to the nearest multiple of 24. Then the long-edge dimensions are calculated such that the 4:3 ratio is maintained.
+    \end{itemize}
+
+  \item Create the directory structure on the server in \texttt{/array/vlasov/}
+    \begin{itemize}
+    \item Keep a copy of all the original images in \texttt{actor00003/}
+
+    \item Create one directory per image size, called \texttt{size3072} (for instance)
+
+    \item For each size, create two subdirectories:
+      \begin{enumerate}
+      \item One for the unaltered images, called \texttt{cover}
+      \item One per number of payload bits, called \texttt{stego-1234bits}
+      \end{enumerate}
+
+    \item Each \texttt{cover} subdirectory will have three files per cover image:
+      \begin{enumerate}
+      \item \texttt{image12345.jpg}: the unaltered image
+      \item \texttt{image12345.costs}: the costs computed by J-UNIWARD
+      \item \texttt{image12345.fea}: the features computed by JRM
+      \end{enumerate}
+
+    \item Each \texttt{stego-1234bits} subdirectory will have one file per stego image:
+      \begin{enumerate}
+      \item \texttt{image12345.jpg}: the stego image, which is the cover image \texttt{sizeXXXX/cover/image12345.jpg} with a 1234-bit message embedded in it
+      \end{enumerate}
+    \end{itemize}
+
+  \item Crop the $3072\times2304$ cover images to the sizes calculated in task 1. Do this by cropping $8\times8$ pixel blocks evenly from the top/bottom and right/left.
+
+  \item Generate the costs (using Dr. Ker's slighty modified J-UNIWARD code) and features (using JRM) for all the cover images of all the different sizes.
+  \begin{itemize}
+  \item JRM produces 22510 real numbers (the features)
+  \item Up to me how to store them, but ASCII is probably the most portable
+  \end{itemize}
+
+  \item Use J-UNIWARD to embed 0.4 bits per non-zero AC coefficient in some of the covers
+
+  \item Write a function that takes a payload size (as the number of bits) as input and computes the probabilities with which each coefficient changes during (binary) embedding.
+    \begin{itemize}
+    \item Goal: given the costs $c_1, c_2, ... c_N$ (where N is the total number of coefficients) of changing each coefficient (by adding/subtracting one), compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ of making each of these changes
+
+    \item Size of the payload: $\sum\limits_{i=1}^N H_2(\pi_i)$
+      \begin{itemize}
+      \item $H_2$ is the ``entropy'' and is defined as:
+        \begin{equation*}
+        H_2(x) = -x \times \log_2 x - (1-x) \times \log_2 (1-x)
+        \end{equation*}
+
+      \item Graph of $H_2$:
+        \begin{center}
+          \includegraphics[width=0.7\linewidth]{h2_plot.png}
+        \end{center}
+      \end{itemize}
+
+    \item Average total cost: $\sum\limits_{i=1}^N c_i \pi_i$
+
+    \item Two (equivalent) optimization problems for computing the payload size:
+      \begin{enumerate}
+      \item Distortion-limited sender (DLS)
+        \begin{equation*}
+        \text{Maximize } \sum\limits_{i=1}^N H_2(\pi_i) \text{ such that } \sum\limits_{i=1}^N c_i \pi_i \leq C
+        \end{equation*}
+
+      \item Payload-limited sender (PLS)
+        \begin{equation*}
+        \text{Minimize } \sum\limits_{i=1}^N c_i \pi_i \text{ such that } \sum\limits_{i=1}^N H_2(\pi_i) \geq M
+        \end{equation*}
+      \end{enumerate}
+
+    \item For some fixed $\lambda$, we can compute the probabilities:
+      \begin{equation*}
+      \pi_i = \frac{1}{1+e^{\lambda \cdot c_i}}
+      \end{equation*}
+
+    \item We'll use PLS, where M is the payload size.
+      \begin{itemize}
+      \item The optimal solution is when $\sum\limits_{i=1}^N H_2(\pi_i) = M$
+      \item $\sum\limits_{i=1}^N H_2(\pi_i)$ is actually monotonically increasing, so we can find a value of $\lambda$ such that $\sum\limits_{i=1}^N H_2(\pi_i) = M$ for any M we choose. Then, we can compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ using this value of $\lambda$.
+      \item The end goal is to do the embedding ourselves by modifying each coefficient with these probabilities.
+      \end{itemize}
+    \end{itemize}
+
+  \end{enumerate}
+
+\item \textit{Is 80 a standard JPEG quality factor (QF)?} In the massive image database released by Flickr, the most common QFs were 100, the QF used by iPhones, and 80. So we're using 80 because that gives us a greater selection of images.
+
+\end{itemize}
+
+
 \section{17/10/18}
 
 \begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Read Chapters 1 and 2 of the Advanced Security notes on steganography
+  \item Read the 2008 paper ``The Square Root Law of Steganographic Capacity''
+  \end{itemize}
 
 \item Discussed questions I had about Chapter 1 (Steganography) and Chapter 2 (Steganalysis) of the Advanced Security notes and about the 2008 paper.
   \begin{itemize}
@@ -33,7 +157,7 @@
 
   \item \textit{What determines a cover's ``source''?} Primarily the camera. The camera's ISO setting, in particular, is very important. The subject of the photos don't make much of a difference.
 
-  \item \textit{In JPEG compression, don't you lose some information when dividing the image into 8x8 pixel blocks?} No, the DCT is linear (i.e. 1-to-1 mapping from 8x8 blocks to coefficients)
+  \item \textit{In JPEG compression, don't you lose some information when dividing the image into $8\times8$ pixel blocks?} No, the DCT is linear (i.e. 1-to-1 mapping from $8\times8$ blocks to coefficients)
 
   \item \textit{Is a JPEG decompressed every time you view it on a computer?} Yes
 
@@ -49,6 +173,8 @@
 \section{03/10/18}
 
 \begin{itemize}
+
+\item What I did: N/A
 
 \item Discussed software to be used for embedding (J-UNIWARD), feature extraction (JRM), and detection (ensemble of linear classifiers)
   \begin{itemize}
