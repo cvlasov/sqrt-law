@@ -24,14 +24,124 @@ All timings mentioned here are approximate. The specific results can be found in
 \section{Image Curation}
 
 \subsection{Initial Image Selection}
+\label{subsec:initial-image-selection}
 
 The first step was selecting which images to use for the experiments. Flickr released a massive database of millions of images and we will use those taken by one user, referred to as \texttt{actor00003}. There are $13,349$ images taken by this user and they are on the server under \texttt{/array/vlasov/actor00003}. The largest image size in this directory is $3072\times2304$ pixels and information about all the images is in a file called \texttt{metadata.txt} in the same directory.
 
-I wrote a script called \texttt{initial\_curation.py} to do the initial image filtering. The script uses the metadata file to identify the images that are $3072\times2304$ pixels, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new subdirectory called \texttt{size3072}. The script took just under 20 minutes to run and 9539 grayscale, $3072\times2304$ pixel landscape images were produced.
+I wrote a script called \texttt{initial\_curation.py} to do the initial image filtering. The script uses the metadata file to identify the images that are $3072\times2304$ pixels, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new subdirectory called \texttt{size3072}. The script took just under 20 minutes to run and 9539 grayscale, $3072\times2304$ pixel, landscape images were produced.
+
+
+\subsection{Choosing Image Sizes}
+\label{subsec:image-sizes}
+
+The largest size is $3072\times2304$ since that is the largest size we have from \texttt{actor00003} and the smallest size was somewhat arbitrarily chosen to be $360\times240$. In the graphs with my experiment results, I will want the image sizes (specifically the total number of pixels) to be evenly distributed along the x-axis. In order to achieve this, I picked sizes such that the difference between the number of pixels in consecutive image sizes is roughly the same. I calculated this interval using:
+\begin{equation*}
+\frac{3072 \cdot 2304 - 320 \cdot 240}{9} \approx 777,899 \text{ pixels}
+\end{equation*}
+
+It is straightforward to compute the total number of pixels in the $n^{th}$ image size (where $320 \times 240$ is the $1^{st}$ size and $3072 \times 2304$ is the $10^{th}$ size):
+\begin{equation*}
+320 \cdot 240 + (n-1) \cdot 777,899
+\end{equation*}
+
+Given the desired number of pixels (call it $P$), we can find dimensions with a 4:3 ratio that produce approximately $P$ pixels. We do so by solving the following equation for $x$ and then computing $4x$ and $3x$ to get the dimensions:
+\begin{equation*}
+ P \approx 4x \cdot 3x = 12x^2
+ \end{equation*}
+
+The results of these computations are:
+\begin{center}
+\begin{tabular}{ c  c | c}
+Width & Height & Total pixels \\ \hline
+3072 & 2304 & 7,077,888 \\
+2912 & 2184 & 6,359,808 \\
+2720 & 2040 & 5,548,800 \\
+2528 & 1896 & 4,793,088 \\
+2304 & 1728 & 3,981,312 \\
+2048 & 1536 & 3,145,728 \\
+1792 & 1344 & 2,408,448 \\
+1472 & 1104 & 1,625,088 \\
+1056 & 792 & 836,352 \\
+320 & 240 & 76,800 \\
+\end{tabular}
+\end{center}
 
 
 %-----------------------
 \chapter{Meeting Notes}
+
+\section{31/10/18}
+
+\begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Put together this document
+  \item Organized all documents and scripts in my (private) GitHub repository
+  \item Fixed \texttt{initial\_curation.py} (the problem is documented in Section \ref{sec:lessons-learned}) and I successfully ran it on the server
+    \begin{itemize}
+    \item Original images: \texttt{/array/vlasov/actor00003/original}
+    \item All $3072\times2304$, grayscale, landscape images are in a new directory \texttt{/array/vlasov/actor00003/size3072}
+    \end{itemize}
+  \item Learned how to use \texttt{pyplot}, plotted $H_2$ as an exercise
+  \item Computed the image sizes we'll use (the process and results are described in Section \ref{subsec:image-sizes})
+    \begin{itemize}
+    \item The method discussed on 24/10/18 doesn't work. It does produce equally sized intervals (in terms of the difference in the total number of pixels between consecutive sizes), but only between $320\times240$ and the ninth-largest size since this interval is only around $70,000$. The ninth-largest size would be $960\times720$, which is clearly much smaller than $3072\times2304$.
+    \item In order to get sizes linearly distributed in terms of the total number of pixels, the interval needs to be closer to $700,000$ pixels.
+    \end{itemize}
+  \end{itemize}
+
+\item \textit{Is the value of $\lambda$ bounded? How should the binary search (in the context of PLS) work?}
+  \begin{itemize}
+  \item $\lambda = 0$ corresponds to maximum entropy (aka. maximum payload) because then $\pi_i = \frac{1}{1+e^{\lambda c_i}} = \frac{1}{2}$
+
+  \item As $\lambda \rightarrow \infty$, $\pi_i \rightarrow 0$
+
+  \item The order of magnitude of $\lambda$ depends on the order of magnitude of the costs.
+
+  \item The binary search will have two stages:
+    \begin{enumerate}
+    \item Exponential search to find an upper bound on $\lambda$. This will involve trying exponentially large values such as $0, 1, 10, 100, ...$ until a value is found such that $\sum\limits_{i=1}^N H_2(\pi_i) > M$
+    \item Suppose the first value where this inequality holds is $\lambda = 10^n$. We now do a binary search for $\lambda$ with a lower bound of $10^{n-1}$ and an upper bound of $10^n$ and we want to find a value such that $\sum\limits_{i=1}^N H_2(\pi_i) \in [m, m+1)$, where $m$ is the number of payload bits.
+    \end{enumerate}
+  \end{itemize}
+  
+\item In Dr. Ker's paper ``On the Relationship Between Embedding Costs and Steganographic Capacity'' from June 2018, he writes about how if the detector knows the costs $c_1, c_2, ... c_N$, then the objective that should be minimized is $\sum\limits_{i=1}^N c_i \pi_i^2$, which is the same as the objective in PLS except with the $\pi_i$ terms squared.
+  \begin{itemize}
+  \item This is a possible project extension.
+
+  \item The tricky part is computing the probabilities since the optimal solution is no longer $\pi_i = \frac{1}{1+e^{\lambda c_i}}$. Instead, it's $\frac{\pi_i}{H2'(\pi_i)} = \lambda c_i$.
+
+  \item The probabilities can be computed by running Newton-Raphson several times (Dr. Ker did it 8 times)
+
+  \item I don't need to tackle this now, but it's worth keeping in mind.
+  \end{itemize}
+
+\item When I use Dr. Ker's J-UNIWARD hack, I need to make sure that I work out the order in which the costs are written to the file.
+  \begin{itemize}
+  \item It's hard to tell just by looking at the costs whether or not they're in the right order. If I'm wrong, I'll probably find out since the embedding will be very detectable.
+  \item It's very likely that the $8\times8$ blocks are analyzed from left to right, top to bottom. However, within each block the costs could be left to right, top to bottom \textbf{or} in the zigzag order used to store the quantized coefficients. I need to check this.
+  \end{itemize}
+
+\item Once I compute the probabilities, it might be a good idea to use Python's \texttt{random.seed(..)} method (with the image number as the seed) in order to do the embedding. It can be used to determine whether or not to change each coefficient and so I'll always get the same embedding with the same cover, modulo rounding.
+
+\item Dr. Ker has a faster version of JRM for feature extraction.
+
+\item Tips:
+  \begin{itemize}
+  \item After embedding, open the stego image to make sure nothing got messed up (e.g. due to the order of the costs or coefficients).
+
+  \item It would be a good idea to write some scripts to check things like:
+    \begin{itemize}
+    \item The number of coefficients that differ between the cover and stego images is $\approx \sum\limits_{i=1}^N \pi_i$
+    \item Coefficients that differ between the cover and stego images only differ by $\pm1$
+    \end{itemize}
+
+  \item Test things out on small images (e.g. $64\times64$) to save time in case there are bugs.
+  \end{itemize}
+
+\end{itemize}
+
 
 \section{24/10/18}
 
@@ -40,7 +150,7 @@ I wrote a script called \texttt{initial\_curation.py} to do the initial image fi
 \item What I did:
   \begin{itemize}
   \item Read Chapter 3 of the Advanced Security notes on steganography
-  \item Wrote a script (\texttt{initial\_curation.py}) to find all the largest images in the \texttt{actor00003} directory and then make them all grayscale and landscape
+  \item Wrote a script (\texttt{initial\_curation.py}) to find all the largest images in the \texttt{actor00003} directory and then make them all grayscale and landscape (described in Section \ref{subsec:initial-image-selection})
     \begin{itemize}
     \item Wasn't quite working due to ``\texttt{Empty input file}'' error when performing multiple \texttt{jpegtran} operations
     \end{itemize}
@@ -62,7 +172,7 @@ I wrote a script called \texttt{initial\_curation.py} to do the initial image fi
 
   \item Create the directory structure on the server in \texttt{/array/vlasov/}
     \begin{itemize}
-    \item Keep a copy of all the original images in \texttt{actor00003/}
+    \item Keep a copy of all the original images in \texttt{actor00003/original}
 
     \item Create one directory per image size, called \texttt{size3072} (for instance)
 
@@ -93,17 +203,17 @@ I wrote a script called \texttt{initial\_curation.py} to do the initial image fi
   \item Up to me how to store them, but ASCII is probably the most portable
   \end{itemize}
 
-  \item Use J-UNIWARD to embed 0.4 bits per non-zero AC coefficient in some of the covers
+  \item Use J-UNIWARD to embed 0.4 bits per non-zero AC coefficient in some of the covers.
 
-  \item Write a function that takes a payload size (as the number of bits) as input and computes the probabilities with which each coefficient changes during (binary) embedding.
+  \item Write a function that takes the number of payload bits as input and computes the probabilities with which each coefficient changes during (binary) embedding.
     \begin{itemize}
-    \item Goal: given the costs $c_1, c_2, ... c_N$ (where N is the total number of coefficients) of changing each coefficient (by adding/subtracting one), compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ of making each of these changes
+    \item Goal: given the costs $c_1, c_2, ... c_N$ (where N is the total number of coefficients) of changing each coefficient (by adding or subtracting one), compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ of making each of these changes
 
     \item Size of the payload: $\sum\limits_{i=1}^N H_2(\pi_i)$
       \begin{itemize}
       \item $H_2$ is the ``entropy'' and is defined as:
         \begin{equation*}
-        H_2(x) = -x \times \log_2 x - (1-x) \times \log_2 (1-x)
+        H_2(x) = -x \cdot \log_2 x - (1-x) \cdot \log_2 (1-x)
         \end{equation*}
 
       \item Graph of $H_2$:
@@ -129,20 +239,20 @@ I wrote a script called \texttt{initial\_curation.py} to do the initial image fi
 
     \item For some fixed $\lambda$, we can compute the probabilities:
       \begin{equation*}
-      \pi_i = \frac{1}{1+e^{\lambda \cdot c_i}}
+      \pi_i = \frac{1}{1+e^{\lambda c_i}}
       \end{equation*}
 
     \item We'll use PLS, where M is the payload size.
       \begin{itemize}
       \item The optimal solution is when $\sum\limits_{i=1}^N H_2(\pi_i) = M$
-      \item $\sum\limits_{i=1}^N H_2(\pi_i)$ is actually monotonically increasing, so we can find a value of $\lambda$ such that $\sum\limits_{i=1}^N H_2(\pi_i) = M$ for any M we choose. Then, we can compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ using this value of $\lambda$.
+      \item $\sum\limits_{i=1}^N H_2(\pi_i)$ is actually monotonically decreasing, so we can find a value of $\lambda$ such that $\sum\limits_{i=1}^N H_2(\pi_i) = M$ for any M we choose. Then, we can compute the probabilities $\pi_1, \pi_2, ..., \pi_N$ using this value of $\lambda$.
       \item The end goal is to do the embedding ourselves by modifying each coefficient with these probabilities.
       \end{itemize}
     \end{itemize}
 
   \end{enumerate}
 
-\item \textit{Is 80 a standard JPEG quality factor (QF)?} In the massive image database released by Flickr, the most common QFs were 100, the QF used by iPhones, and 80. So we're using 80 because that gives us a greater selection of images.
+\item \textit{Is 80 a standard JPEG quality factor (QF)?} In the massive image database released by Flickr, the most common QFs were 100, the QF used by iPhones, and 80. So, we're using 80 because that gives us a greater selection of images.
 
 \end{itemize}
 
@@ -243,6 +353,7 @@ I wrote a script called \texttt{initial\_curation.py} to do the initial image fi
 \end{itemize}
 
 \section{Lessons Learned}
+\label{sec:lessons-learned}
 
 \begin{itemize}
 
