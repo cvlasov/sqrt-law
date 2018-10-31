@@ -200,4 +200,44 @@
 
 \end{itemize}
 
+
+%-----------------------
+\chapter{Notes to Self}
+
+\section{Useful Commands}
+
+\begin{itemize}
+
+\item Run a command in the background so that you can keep using the terminal or close it
+  \begin{itemize}
+  \item \texttt{nohup python script.py \&> script\_output.out \&}
+  \end{itemize}
+
+\item Check on processes that are running
+  \begin{itemize}
+  \item \texttt{ps aux | grep vlasov}
+  \end{itemize}
+
+\end{itemize}
+
+
+\section{Script Timings}
+
+\begin{itemize}
+
+\item \texttt{initial\_curation.py}
+  \begin{itemize}
+  \item $1131.18478608s \approx 18m51s$ (30/10/18)
+  \end{itemize}
+
+\end{itemize}
+
+\section{Lessons Learned}
+
+\begin{itemize}
+
+\item The input and output file to \texttt{jpegtran} can't be the same, otherwise you get an ``\texttt{Empty input file}'' error.
+
+\end{itemize}
+
 \end{document}
