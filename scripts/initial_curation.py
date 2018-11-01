@@ -16,7 +16,7 @@ parser.add_argument("-hei", "--height", type=int, default=2304,
 parser.add_argument("-m", "--metadata", type=argparse.FileType('r'),
                     default='metadata.txt',
                     help="File with metadata about the images")
-parser.add_argument("-to", "--to-dir", default='size3072/',
+parser.add_argument("-to", "--to-dir", default='size3072/cover/',
                     help="Directory where images should be placed")
 parser.add_argument("-wid", "--width", type=int, default=3072,
                     help="Width in pixels of the images to select")
