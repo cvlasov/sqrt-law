@@ -28,7 +28,7 @@ All timings mentioned here are approximate. The specific results can be found in
 
 The first step was selecting which images to use for the experiments. Flickr released a massive database of millions of images and we will use those taken by one user, referred to as \texttt{actor00003}. There are $13,349$ images taken by this user and they are on the server under \texttt{/array/vlasov/actor00003}. The largest image size in this directory is $3072\times2304$ pixels and information about all the images is in a file called \texttt{metadata.txt} in the same directory.
 
-I wrote a script called \texttt{initial\_curation.py} to do the initial image filtering. The script uses the metadata file to identify the images that are $3072\times2304$ pixels, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new subdirectory called \texttt{size3072}. The script took just under 20 minutes to run and 9539 grayscale, $3072\times2304$ pixel, landscape images were produced.
+I wrote a script called \texttt{initial\_curation.py} to do the initial image filtering. The script uses the metadata file to identify the images that are $3072\times2304$ pixels, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new subdirectory called \texttt{size3072}. The script took around 10 minutes to run and 9539 grayscale, $3072\times2304$ pixel, landscape images were produced.
 
 
 \subsection{Choosing Image Sizes}
@@ -66,9 +66,42 @@ Width & Height & Total pixels \\ \hline
 \end{tabular}
 \end{center}
 
+\subsection{Cropping}
+\label{subsec:cropping}
+
 
 %-----------------------
 \chapter{Meeting Notes}
+
+\section{07/11/18}
+
+\begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Created the file structure on the server.
+    \begin{itemize}
+    \item Each \texttt{actor00003/sizeXXXX/} directory only has one subdirectory called \texttt{cover} since we need to decide/calculate how many bits of payload to embed for each size.
+    \end{itemize}
+
+  \item Changed \texttt{initial\_curation.py} so that constants in the file are instead passed in as command-line arguments.
+    \begin{itemize}
+    \item Reran it and it was almost twice as fast (11 vs 19 minutes).
+    \end{itemize}
+
+  \item Finished \texttt{compute\_probabilities.py}. It finds a $\lambda$ such that:
+    \begin{equation*}
+    \sum\limits_{i=1}^N H_2(\pi_i) \in [m, m+1)\text{, where $m$ is the payload size to simulate}
+    \end{equation*}
+
+  \item Wrote \texttt{crop.py} and ran it for the other nine image sizes.
+    \begin{itemize}
+    \item It crops $8\times8$ blocks evenly from the top/bottom and right/left.
+    \item The process is documented in Section \ref{subsec:cropping}.
+    \end{itemize}
+  \end{itemize}
+
+\end{itemize}
 
 \section{31/10/18}
 
@@ -89,6 +122,7 @@ Width & Height & Total pixels \\ \hline
     \item The method discussed on 24/10/18 doesn't work. It does produce equally sized intervals (in terms of the difference in the total number of pixels between consecutive sizes), but only between $320\times240$ and the ninth-largest size since this interval is only around $70,000$. The ninth-largest size would be $960\times720$, which is clearly much smaller than $3072\times2304$.
     \item In order to get sizes linearly distributed in terms of the total number of pixels, the interval needs to be closer to $700,000$ pixels.
     \end{itemize}
+  \item Started working on \texttt{compute\_probabilities.py}
   \end{itemize}
 
 \item \textit{Is the value of $\lambda$ bounded? How should the binary search (in the context of PLS) work?}
@@ -345,10 +379,32 @@ Width & Height & Total pixels \\ \hline
 
 \begin{itemize}
 
-\item \texttt{initial\_curation.py}
+\item \texttt{initial\_curation.py} (before I changed constants to command-line arguments)
   \begin{itemize}
   \item $1131.18478608s \approx 18m51s$ (30/10/18)
   \end{itemize}
+
+\item \texttt{initial\_curation.py --from-dir original/} \\ \texttt{--to-dir size3072/cover/}
+  \begin{itemize}
+  \item $655.185225964s \approx 10m55s$ (01/11/18)
+  \end{itemize}
+
+\item \texttt{crop.py --from-dir size3072/cover --to-dir sizeW/cover/} \\
+         \texttt{ --width W --height H}, where:
+  \begin{center}
+  \begin{tabular}{ c c | c c | c }
+  W & H & Seconds & Approx. Time & Date\\ \hline
+  2912 & 2184 & 689.414359808 & 11m29s & 01/11/18 \\
+  2720 & 2040 & 662.552460909 & 11m02s & 01/11/18 \\
+  2528 & 1896 & 662.54279089 & 11m02s & 01/11/18 \\
+  2304 & 1728 & 632.872202158 & 10m32s & 01/11/18 \\
+  2048 & 1536 & 605.926501989 & 10m05s & 01/11/18 \\
+  1792 & 1344 & 555.097690105 & 9m15s & 01/11/18 \\
+  1472 & 1104 & 511.460752964 & 8m31s & 01/11/18 \\
+  1056 & 792 & 438.49830699 & 7m18s & 01/11/18 \\
+  320 & 240 & 359.436480045 & 5m59s & 01/11/18 \\
+  \end{tabular}
+  \end{center}
 
 \end{itemize}
 
@@ -358,6 +414,8 @@ Width & Height & Total pixels \\ \hline
 \begin{itemize}
 
 \item The input and output file to \texttt{jpegtran} can't be the same, otherwise you get an ``\texttt{Empty input file}'' error.
+
+\item If it looks like directories on the server have disappeared, turn off f.lux or change the colour settings in \texttt{.bashrc}.
 
 \end{itemize}
 
