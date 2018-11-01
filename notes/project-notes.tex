@@ -101,7 +101,7 @@ Width & Height & Total pixels \\ \hline
 
   \item The binary search will have two stages:
     \begin{enumerate}
-    \item Exponential search to find an upper bound on $\lambda$. This will involve trying exponentially large values such as $0, 1, 10, 100, ...$ until a value is found such that $\sum\limits_{i=1}^N H_2(\pi_i) > M$
+    \item Exponential search to find an upper bound on $\lambda$. This will involve trying exponentially large values such as $0, 1, 10, 100, ...$ until a value is found such that $\sum\limits_{i=1}^N H_2(\pi_i) < M$
     \item Suppose the first value where this inequality holds is $\lambda = 10^n$. We now do a binary search for $\lambda$ with a lower bound of $10^{n-1}$ and an upper bound of $10^n$ and we want to find a value such that $\sum\limits_{i=1}^N H_2(\pi_i) \in [m, m+1)$, where $m$ is the number of payload bits.
     \end{enumerate}
   \end{itemize}
