@@ -3,16 +3,6 @@ Given the costs of changing each coefficient (c_1...c_N) and the length
 of the payload to embed (m), this script computes the probabilities
 (pi_1...pi_N) with which each coefficient should be changed in order
 to simulate the embedding of an m-bit payload.
-
-The script has three command-line arguments:
-  -b (--bits) : number of bits in the payload (required)
-  -c (--costs) : name of the file with the costs (optional,
-                 default: costs.txt)
-  -o (--outputfile) : name of the file to which the probabilities should
-                      be written (optional, default: probabilities.txt)
-
-It also has a command-line flag (-v, --verbose) which, if turned on,
-makes the script print the results of intermediate computations.
 """
 
 import argparse
