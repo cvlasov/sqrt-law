@@ -13,28 +13,28 @@ import time
 # HELPER FUNCTIONS
 
 def H2_scalar(x):
-    """
-    Computes the entropy of a scalar.
-    """
-    if   x == 0: return - (1-x) * math.log(1-x,2)
-    elif x == 1: return - x * math.log(x,2)
-    else:        return - x * math.log(x,2) - (1-x) * math.log(1-x,2)
+  """
+  Computes the entropy of a scalar.
+  """
+  if   x == 0: return - (1-x) * math.log(1-x,2)
+  elif x == 1: return - x * math.log(x,2)
+  else:        return - x * math.log(x,2) - (1-x) * math.log(1-x,2)
 
 """Vectorized version of H2_scalar"""
 H2 = np.vectorize(H2_scalar)
 
 def entropy_sum(probabilities):
-    """
-    Computes the sum of the entropies of the given probabilities.
-    """
-    return np.sum(H2(probabilities))
+  """
+  Computes the sum of the entropies of the given probabilities.
+  """
+  return np.sum(H2(probabilities))
 
 def compute_probabilities(costs, lam):
-    """
-    Computes the probability of modifying each coefficient, given the cost of
-    modifying each one and the value of lambda.
-    """
-    return 1 / (1 + np.exp(lam*costs))
+  """
+  Computes the probability of modifying each coefficient, given the cost of
+  modifying each one and the value of lambda.
+  """
+  return 1 / (1 + np.exp(lam*costs))
 
 ##########
 # SCRIPT #
@@ -57,8 +57,8 @@ start = time.time()
 cost_list = []
 
 for line in args.costs:
-    for c in line.split():
-        cost_list.append(float(c))
+  for c in line.split():
+    cost_list.append(float(c))
 
 costs = np.array(cost_list)
 
@@ -71,14 +71,14 @@ if args.verbose: print('------------------')
 if args.verbose: print('EXPONENTIAL SEARCH')
 
 while (True):
-    probs = compute_probabilities(costs, lam)
-    H_sum = entropy_sum(probs)
-    if args.verbose: print('sum with lambda=' + str(lam) + ' is ' + str(H_sum))
-    if H_sum < m:
-        low = 0 if lam == 1 else int(lam/10)
-        high = lam
-        break
-    lam = 1 if lam == 0 else lam*10
+  probs = compute_probabilities(costs, lam)
+  H_sum = entropy_sum(probs)
+  if args.verbose: print('sum with lambda=' + str(lam) + ' is ' + str(H_sum))
+  if H_sum < m:
+    low = 0 if lam == 1 else int(lam/10)
+    high = lam
+    break
+  lam = 1 if lam == 0 else lam*10
 
 if args.verbose: print('=> lambda is in [' + str(low) + ', ' + str(high) + ')')
 
@@ -88,22 +88,22 @@ if args.verbose: print('BINARY SEARCH')
 probs = np.array([])
 
 while (low <= high):
-    lam = (high+low) / 2
-    probs = compute_probabilities(costs, lam)
-    H_sum = entropy_sum(probs)
-    if args.verbose: print('sum with lambda=' + str(lam) + ' is ' + str(H_sum))
-    if m <= H_sum and H_sum < m+1:
-        break
-    elif H_sum < m:
-        high = lam
-    else:
-        low = lam
+  lam = (high+low) / 2
+  probs = compute_probabilities(costs, lam)
+  H_sum = entropy_sum(probs)
+  if args.verbose: print('sum with lambda=' + str(lam) + ' is ' + str(H_sum))
+  if m <= H_sum and H_sum < m+1:
+    break
+  elif H_sum < m:
+    high = lam
+  else:
+    low = lam
 
 if args.verbose: print('=> chosen lambda: ' + str(lam))
 
 # Write probabilities to text file, one value per line
 for p in probs:
-    args.outputfile.write(str(p) + '\n')
+  args.outputfile.write(str(p) + '\n')
 
 end = time.time()
 print(str(end-start) + ' seconds elapsed')
