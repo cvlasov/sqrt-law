@@ -18,6 +18,7 @@ makes the script print the results of intermediate computations.
 import argparse
 import math
 import numpy as np
+import time
 
 # HELPER FUNCTIONS
 
@@ -59,6 +60,8 @@ parser.add_argument("-o", "--outputfile", type=argparse.FileType('w'),
 parser.add_argument("-v", "--verbose", action='store_true',
                     help="Print intermediate computation results")
 args = parser.parse_args()
+
+start = time.time()
 
 # Get costs
 cost_list = []
@@ -111,3 +114,6 @@ if args.verbose: print('=> chosen lambda: ' + str(lam))
 # Write probabilities to text file, one value per line
 for p in probs:
     args.outputfile.write(str(p) + '\n')
+
+end = time.time()
+print(str(end-start) + ' seconds elapsed')
