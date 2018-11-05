@@ -33,7 +33,7 @@ February 2013
 
 class cost_model_config : public base_cost_model_config {
   public:
-	  mat2D<double>* lpdf;
+    mat2D<double>* lpdf;
   	mat2D<double>* hpdf;
   	mat2D<double>* Tlpdf;
   	mat2D<double>* Thpdf;
