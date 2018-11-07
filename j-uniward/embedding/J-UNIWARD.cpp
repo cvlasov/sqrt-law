@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
          po::value<std::string>(&iDir),
          "directory with the cover images")
         ("images,i",
-         po::value<std::vector<std::string>>(&images),
+         po::value<std::vector<std::string> >(&images),
          "list of cover images")
         ("output-dir,O",
          po::value<std::string>(&oDir),

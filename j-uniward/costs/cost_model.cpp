@@ -32,6 +32,7 @@ February 2013
 #include "cost_model_config.h"
 #include "jstruct.h"
 #include "mat2D.h"
+#include "time.h"
 
 cost_model::cost_model(
     jstruct* coverStruct, cost_model_config* config, const char* filename)
@@ -40,6 +41,8 @@ cost_model::cost_model(
   this->config = config;
   double wetCost = (double)10000000000000;
   mat2D<int>* spatialCover = coverStruct->spatial_arrays[0];
+
+  clock_t t = clock();
 
   // Adjust wavelet impact to the quality factor
   mat2D<mat2D<double>*>* LHwaveletImpact = new mat2D<mat2D<double>*>(8, 8);
@@ -94,6 +97,51 @@ cost_model::cost_model(
 
   delete spatialCover_padded_double;
 
+  // Write the costs to a file
+  int subsize = 7 + config->padsize;
+
+  float* adk_LHwaveletImpact = new float[8*8*subsize*subsize];
+  float* adk_HLwaveletImpact = new float[8*8*subsize*subsize];
+  float* adk_HHwaveletImpact = new float[8*8*subsize*subsize];
+
+  for (int modrow = 0; modrow < 8; modrow++) {
+    for (int modcol = 0; modcol < 8; modcol++) {
+      for (int rsub = 0; rsub < subsize; rsub++) {
+        for (int csub = 0; csub < subsize; csub++) {
+          adk_LHwaveletImpact[csub+rsub*subsize+modcol*subsize*subsize+modrow*subsize*subsize*8] =
+              (float)LHwaveletImpact->Read(modrow, modcol)->Read(rsub, csub);
+          adk_HLwaveletImpact[csub+rsub*subsize+modcol*subsize*subsize+modrow*subsize*subsize*8] =
+              (float)HLwaveletImpact->Read(modrow, modcol)->Read(rsub, csub);
+          adk_HHwaveletImpact[csub+rsub*subsize+modcol*subsize*subsize+modrow*subsize*subsize*8] =
+              (float)HHwaveletImpact->Read(modrow, modcol)->Read(rsub, csub);
+        }
+      }
+    }
+  }
+
+  float* adk_R_LH =
+      new float[(coverStruct->image_height+32)*(coverStruct->image_width+32)];
+  float* adk_R_HL =
+      new float[(coverStruct->image_height+32)*(coverStruct->image_width+32)];
+  float* adk_R_HH =
+      new float[(coverStruct->image_height+32)*(coverStruct->image_width+32)];
+
+  for (int row = 0; row < coverStruct->image_height + 32; row++) {
+    for (int col = 0; col < coverStruct->image_width + 32; col++) {
+      adk_R_LH[row * (coverStruct->image_width + 32) + col] =
+          1.0 / (float)(R_LH->Read(row, col) + config->sigma);
+      adk_R_HL[row * (coverStruct->image_width + 32) + col] =
+          1.0 / (float)(R_HL->Read(row, col) + config->sigma);
+      adk_R_HH[row * (coverStruct->image_width + 32) + col] =
+          1.0 / (float)(R_HH->Read(row, col) + config->sigma);
+    }
+  }
+
+  float* mycosts =
+      new float[coverStruct->image_height * coverStruct->image_width];
+
+  int idx1, idx1a, idx2, idx2a;
+
   for (int row = 0; row < (int)coverStruct->image_height; row++) {
     for (int col = 0; col < (int)coverStruct->image_width; col++) {
       int modRow = row % 8;
@@ -105,15 +153,15 @@ cost_model::cost_model(
       double rho = 0;
 
       for (int r_sub = 0; r_sub < 7 + config->padsize; r_sub++) {
-        for (int c_sub = 0; c_sub < 7 + config->padsize; c_sub++) {
-          rho += LHwaveletImpact->Read(modRow, modCol)->Read(r_sub, c_sub) /
-            (R_LH->Read(subRowsFrom+r_sub, subColsFrom+c_sub) + config->sigma);
+        idx2a=(subRowsFrom+r_sub)*(coverStruct->image_width+32)+subColsFrom;
+        idx1a=r_sub*subsize+modCol*subsize*subsize+modRow*subsize*subsize*8;
 
-          rho += HLwaveletImpact->Read(modRow, modCol)->Read(r_sub, c_sub) /
-            (R_HL->Read(subRowsFrom+r_sub, subColsFrom+c_sub) + config->sigma);
-
-          rho += HHwaveletImpact->Read(modRow, modCol)->Read(r_sub, c_sub) /
-            (R_HH->Read(subRowsFrom+r_sub, subColsFrom+c_sub) + config->sigma);
+        for (int c_sub = 0; c_sub < 23; c_sub++) {
+          idx1 = idx1a + c_sub;
+          idx2 = idx2a + c_sub;
+          rho += adk_LHwaveletImpact[idx1] * adk_R_LH[idx2];
+          rho += adk_HLwaveletImpact[idx1] * adk_R_HL[idx2];
+          rho += adk_HHwaveletImpact[idx1] * adk_R_HH[idx2];
         }
       }
 
@@ -147,6 +195,30 @@ cost_model::cost_model(
   delete R_LH;
   delete R_HL;
   delete R_HH;
+
+  char* outfilename = new char[1024];
+  sprintf(outfilename, "%s.juni.costs", filename);
+  //printf("outfilename=%s\n", outfilename);
+  FILE* outfile = fopen(outfilename, "wb");
+  fwrite(mycosts, sizeof(float),
+         coverStruct->image_height * coverStruct->image_width, outfile);
+
+  /*
+  for (int row=0; row < (int)coverStruct->image_height; row++) {
+    for (int col=0; col < (int)coverStruct->image_width; col++) {
+        float* pixel_costs = costs + ((col+row*cover->cols)*3);
+        fprintf(outfile,"%.10f\n",pixel_costs[0]);
+    }
+  }
+  */
+
+  fclose(outfile);
+
+  t = clock() - t;
+  printf("%s\t%s\t%dx%d\tcost model took %.6fs\n",
+         filename, outfilename,
+         coverStruct->image_width, coverStruct->image_height,
+         ((float)t) / CLOCKS_PER_SEC);
 }
 
 cost_model::~cost_model() {}
