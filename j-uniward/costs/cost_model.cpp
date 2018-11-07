@@ -215,10 +215,7 @@ cost_model::cost_model(
   fclose(outfile);
 
   t = clock() - t;
-  printf("%s\t%s\t%dx%d\tcost model took %.6fs\n",
-         filename, outfilename,
-         coverStruct->image_width, coverStruct->image_height,
-         ((float)t) / CLOCKS_PER_SEC);
+  printf("%.6fs\n", ((float)t) / CLOCKS_PER_SEC);
 }
 
 cost_model::~cost_model() {}

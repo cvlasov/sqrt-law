@@ -141,12 +141,21 @@ int main(int argc, char** argv) {
       }
     }
 
+    int file_name_w = 16;
+    int seed_w = 6;
+    int size_w = 11;
+    int time_w = 20;
+
     if (verbose) {
-      std::cout << "# J-UNIWARD DISTORTION EMBEDDING SIMULATOR" << std::endl;
+      std::cout << std::endl;
+      std::cout << "J-UNIWARD DISTORTION EMBEDDING SIMULATOR" << std::endl;
       std::cout << "*Cost Mode* - only computing costs, not doing embedding";
       std::cout << std::endl << std::endl;
-      std::cout << "#file name     seed            size";
-      std::cout << std::endl;
+      std::cout << std::left << std::setw(file_name_w) << "File name"
+                << std::left << std::setw(seed_w)      << "Seed"
+                << std::left << std::setw(size_w)      << "Size"
+                << std::left << std::setw(time_w)      << "Cost model time"
+                << std::endl;
     }
 
     clock_t begin = clock();
@@ -159,12 +168,6 @@ int main(int argc, char** argv) {
       fs::path stegoPath(
         fs::path(oDir) / fs::path(images[imageIndex]).filename());
 
-      if (verbose) {
-        std::cout << std::left << std::setw(15)
-                  << coverPath.filename().string() << std::left << std::setw(15)
-                  << randSeed;
-      }
-
       // Load cover
       jstruct* coverStruct = new jstruct(images[imageIndex], true);
 
@@ -173,9 +176,14 @@ int main(int argc, char** argv) {
       //}
 
       if (verbose) {
-        std::cout << std::right << std::setw(4) << coverStruct->image_height
-                  << "x" << std::left << std::setw(10)
-                  << coverStruct->image_width << std::flush;
+        std::stringstream stream;
+        stream << coverStruct->image_height << "x" << coverStruct->image_width;
+        std::string dimensions = stream.str();
+        std::string file_name = coverPath.filename().string();
+        std::cout << std::left << std::setw(file_name_w) << file_name
+                  << std::left << std::setw(seed_w)      << randSeed
+                  << std::left << std::setw(size_w)      << dimensions
+                  << std::flush;
       }
 
       base_cost_model* model =
@@ -189,10 +197,10 @@ int main(int argc, char** argv) {
 
     clock_t end = clock();
 
-    if (config->verbose) {
+    if (verbose) {
       std::cout << std::endl << "Time elapsed: "
-                << double(((double)end - begin) / CLOCKS_PER_SEC) << " s"
-                << std::endl;
+                << double(((double)end - begin) / CLOCKS_PER_SEC) << "s"
+                << std::endl << std::endl;
     }
 
   } catch (std::exception& e) {

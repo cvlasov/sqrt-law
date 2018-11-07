@@ -141,32 +141,44 @@ int main(int argc, char** argv) {
       }
     }
 
+    int file_name_w = 16;
+    int seed_w = 6;
+    int size_w = 11;
+    int payload_w = 14;
+    int distortion_w = 17;
+    int loss_w = 10;
+    int trials_w = 10;
+
     if (verbose) {
-      std::cout << "# J-UNIWARD DISTORTION EMBEDDING SIMULATOR" << std::endl;
+      std::cout << std::endl;
+      std::cout << "J-UNIWARD DISTORTION EMBEDDING SIMULATOR" << std::endl;
 
       if (vm.count("input-dir")) {
-        std::cout << "# input directory = " << iDir << std::endl;
+        std::cout << "--> Input directory = " << iDir << std::endl;
       }
 
-      std::cout << "# output directory = " << oDir << std::endl;
-      std::cout << "# running payload-limited sender with alpha = " << payload
+      std::cout << "--> Output directory = " << oDir << std::endl;
+      std::cout << "--> Running payload-limited sender with alpha = " << payload
                 << " bits per nzAC" << std::endl;
 
       if (stc_constr_height == 0) {
-        std::cout << "# simulating embedding as if the best coding scheme is "
+        std::cout << "--> Simulating embedding as if the best coding scheme is "
                   << "available" << std::endl;
       } else {
-        std::cout << "# using STCs with constraint height h="
+        std::cout << "--> Using STCs with constraint height h = "
                   << stc_constr_height << std::endl;
       }
 
-      std::cout << ")" << std::endl;
       std::cout << std::endl;
-      std::cout << "#file name     seed            size          "
-                << "rel. payload     rel. distortion  ";
+      std::cout << std::left << std::setw(file_name_w)  << "File name"
+                << std::left << std::setw(seed_w)       << "Seed"
+                << std::left << std::setw(size_w)       << "Size"
+                << std::left << std::setw(payload_w)    << "Rel. payload"
+                << std::left << std::setw(distortion_w) << "Rel. distortion";
 
       if (stc_constr_height > 0) {
-        std::cout << "coding loss      # stc emb trials";
+        std::cout << std::left << std::setw(loss_w)   << "Coding loss"
+                  << std::left << std::setw(trials_w) << "# STC emb. trials";
       }
 
       std::cout << std::endl;
@@ -182,12 +194,6 @@ int main(int argc, char** argv) {
       fs::path stegoPath(
         fs::path(oDir) / fs::path(images[imageIndex]).filename());
 
-      if (verbose) {
-        std::cout << std::left << std::setw(15)
-                  << coverPath.filename().string() << std::left << std::setw(15)
-                  << randSeed;
-      }
-
       // Load cover
       jstruct* coverStruct = new jstruct(images[imageIndex], true);
 
@@ -196,9 +202,14 @@ int main(int argc, char** argv) {
       }
 
       if (verbose) {
-        std::cout << std::right << std::setw(4) << coverStruct->image_height
-                  << "x" << std::left << std::setw(10)
-                  << coverStruct->image_width << std::flush;
+        std::stringstream stream;
+        stream << coverStruct->image_height << "x" << coverStruct->image_width;
+        std::string dimensions = stream.str();
+        std::string file_name = coverPath.filename().string();
+        std::cout << std::left << std::setw(file_name_w) << file_name
+                  << std::left << std::setw(seed_w)      << randSeed
+                  << std::left << std::setw(size_w)      << dimensions
+                  << std::flush;
       }
 
       base_cost_model* model =
@@ -219,17 +230,17 @@ int main(int argc, char** argv) {
       coverStruct->jpeg_write(stegoPath.string(), true);
 
       if (verbose) {
-        std::cout	<< std::left << std::setw(17) << alpha_out << std::left
-                  << std::setw(17) << distortion /
-                  (coverStruct->image_height * coverStruct->image_width);
+        int pixels = coverStruct->image_height * coverStruct->image_width;
+        int rel_distortion = distortion / pixels;
+        std::cout << std::left << std::setw(payload_w)    << alpha_out
+                  << std::left << std::setw(distortion_w) << rel_distortion;
 
         if (stc_constr_height > 0) {
-          std::cout	<< std::left << std::setw(17) << coding_loss_out
-                    << std::left << std::setw(17) << stc_trials_used
-                    << std::endl << std::flush;
+          std::cout	<< std::left << std::setw(loss_w)   << coding_loss_out
+                    << std::left << std::setw(trials_w) << stc_trials_used;
         }
 
-        std::cout << std::endl;
+        std::cout << std::endl << std::flush;
       }
 
       delete coverStruct;
@@ -242,7 +253,7 @@ int main(int argc, char** argv) {
 
     if (config->verbose) {
       std::cout << std::endl << "Time elapsed: "
-                << double(((double)end - begin) / CLOCKS_PER_SEC) << " s"
+                << double(((double)end - begin) / CLOCKS_PER_SEC) << "s"
                 << std::endl;
     }
 
