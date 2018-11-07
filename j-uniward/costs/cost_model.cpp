@@ -198,19 +198,14 @@ cost_model::cost_model(
 
   char* outfilename = new char[1024];
   sprintf(outfilename, "%s.juni.costs", filename);
-  //printf("outfilename=%s\n", outfilename);
-  FILE* outfile = fopen(outfilename, "wb");
-  fwrite(mycosts, sizeof(float),
-         coverStruct->image_height * coverStruct->image_width, outfile);
+  FILE* outfile = fopen(outfilename, "w");
 
-  /*
-  for (int row=0; row < (int)coverStruct->image_height; row++) {
-    for (int col=0; col < (int)coverStruct->image_width; col++) {
-        float* pixel_costs = costs + ((col+row*cover->cols)*3);
-        fprintf(outfile,"%.10f\n",pixel_costs[0]);
+  for (int row = 0; row < (int)coverStruct->image_height; row++) {
+    for (int col = 0; col < (int)coverStruct->image_width; col++) {
+        float* pixel_costs = costs + ((col + row * cover->cols)*3);
+        fprintf(outfile, "%.10f\n", pixel_costs[0]);
     }
   }
-  */
 
   fclose(outfile);
 
