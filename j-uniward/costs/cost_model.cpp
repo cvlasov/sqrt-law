@@ -196,8 +196,11 @@ cost_model::cost_model(
   delete R_HL;
   delete R_HH;
 
+  std::string filename_str(filename);
+  size_t dot_jpg_index = filename_str.find_last_of(".");
+  filename_str = filename_str.substr(0, dot_jpg_index);
   char* outfilename = new char[1024];
-  sprintf(outfilename, "%s.juni.costs", filename);
+  sprintf(outfilename, "%s.costs", filename_str.c_str());
   FILE* outfile = fopen(outfilename, "w");
 
   for (int row = 0; row < (int)coverStruct->image_height; row++) {
