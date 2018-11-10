@@ -66,8 +66,11 @@ Width & Height & Total pixels \\ \hline
 \end{tabular}
 \end{center}
 
+
 \subsection{Cropping}
 \label{subsec:cropping}
+
+I wrote a script called \texttt{crop.py} to crop the original cover photos to the sizes computed in Section \ref{subsec:image-sizes}. It takes the desired height and width as well as source and destination directories as commandline arguments. Then it computes where the cropping should start so that $8 \times 8$ blocks are cropped evenly from the top/bottom and left/right and then runs \texttt{jpegtran} to do the cropping on all the images in the given source directory. It took around 6 minutes to crop to the smallest size ($320 \times 240$) and 11 and a half minutes to crop to the second-largest size ($2720 \times 2040$).
 
 
 %-----------------------
@@ -81,12 +84,13 @@ Width & Height & Total pixels \\ \hline
   \begin{itemize}
   \item Created the file structure on the server.
     \begin{itemize}
-    \item Each \texttt{actor00003/sizeXXXX/} directory only has one subdirectory called \texttt{cover} since we need to decide/calculate how many bits of payload to embed for each size.
+    \item Each \texttt{actor00003/sizeXXXX/} directory has one subdirectory called \texttt{cover}.
+    \item We need to decide/calculate how many bits of payload to embed for each size before creating subdirectories for all the different payload sizes.
     \end{itemize}
 
   \item Changed \texttt{initial\_curation.py} so that constants in the file are instead passed in as command-line arguments.
     \begin{itemize}
-    \item Reran it and it was almost twice as fast (11 vs 19 minutes).
+    \item Reran it and it was almost twice as fast (11 vs 19 minutes), though the speedup is probably not related to this change.
     \end{itemize}
 
   \item Finished \texttt{compute\_probabilities.py}. It finds a $\lambda$ such that:
@@ -99,9 +103,49 @@ Width & Height & Total pixels \\ \hline
     \item It crops $8\times8$ blocks evenly from the top/bottom and right/left.
     \item The process is documented in Section \ref{subsec:cropping}.
     \end{itemize}
+
+  \item Refactored the J-UNIWARD code (C++ source files) for readability and uploaded them to my GitHub repository in the \texttt{j-uniward} directory.
+    \begin{itemize}
+    \item Created a version that integrates Dr. Ker's hack to save the costs to a file (in ASCII) without doing the actual embedding.
+    \item 99\% sure the costs are output in row order, which would be the intuitive way to implement it.
   \end{itemize}
 
+  \item Started working on \texttt{compute\_costs.py}, which runs the hacked J-UNIWARD on all images in a directory.
+  \end{itemize}
+
+\item Computing the costs for all the images of all sizes
+  \begin{itemize}
+  \item On one core, it will take:
+    \begin{equation*}
+    50s \times 10000 \times (1 + 0.9 + ... + 0.1) \approx 763 \text{ hours} \approx 32 \text{ days}
+    \end{equation*}
+  \item I can use 8-10 of the server's 40 cores.
+  \item I'll run the script using \texttt{nohup} once per directory and obviously the process will finish faster for the smaller images, so I can start on the next task (feature computation) with those that finish first.
+  \end{itemize}
+
+\item Once the costs are computed, the next task is computing the features.
+  \begin{itemize}
+  \item The original plan was to use \href{http://dde.binghamton.edu/download/ensemble/}{JRM}.
+  \item We will instead use a \href{http://dde.binghamton.edu/download/LCLSMR/}{low-complexity linear classifier}, which achieves similar performance but has a lower computational complexity.
+  \end{itemize}
+
+\item Then, I'll start by using J-UNIWARD with 0.4 bits per non-zero coefficient. I then need to compute the features of the stego objects. Once this is done, I can train the classifier with the features of all the cover and stego objects.
+
+\item When training the classifier, it's important to keep the cover/stego objects pairs together (i.e. not put the cover in the training set and the stego in the testing test for cross-validation).
+  \begin{itemize}
+  \item This is important because it ensures the classfier learns the correct boundary.
+  \end{itemize}
+
+\item The binary embedding I'll write will take the number of bits to embed as input.
+  \begin{itemize}
+  \item We will compute the specific number of bits to run the embedding with by manually computing $r \cdot \sqrt{n}$ and $r \cdot \sqrt{n} \cdot \log n$, where $n$ is the total number of pixels in each image and $r$ is some constant we'll pick.
+  \item We'll pick $r$ such that it makes the detectability of the ``middle'' image size the median among the detectabilities of all the sizes, where ``detectability'' refers to the classifier's accuracy.
+  \end{itemize}
+
+\item When the classifier training function asks for the costs ``row-by-row'', they mean it should be a big matrix where the first half of the rows are the costs of the cover images, in order, and the second half are the costs of the stego images, in the same order.
+
 \end{itemize}
+
 
 \section{31/10/18}
 
@@ -369,6 +413,11 @@ Width & Height & Total pixels \\ \hline
 \item Check on processes that are running
   \begin{itemize}
   \item \texttt{ps aux | grep vlasov}
+  \end{itemize}
+
+\item See what processes are currently running, how many resources they're using, etc.
+  \begin{itemize}
+  \item \texttt{htop}
   \end{itemize}
 
 \end{itemize}
