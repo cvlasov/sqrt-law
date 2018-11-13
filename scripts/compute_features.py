@@ -17,9 +17,10 @@ args = parser.parse_args()
 start = time.time()
 
 for image_name in os.listdir(args.input_dir):
-  name_without_ext = os.path.splitext(image_name)[0]
-  subprocess.call('./jrm -a ' + args.input_dir + image_name + ' > '
-                  + args.input_dir + name_without_ext + '.fea', shell=True)
+  filename, file_ext = os.path.splitext(image_name)
+  if file_ext == '.jpg':
+    subprocess.call('./jrm -a ' + args.input_dir + image_name + ' > '
+                    + args.input_dir + filename + '.fea', shell=True)
 
 end = time.time()
 print('\n------------------------\n')
