@@ -123,13 +123,13 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   \item I'll run the script using \texttt{nohup} once per directory and obviously the process will finish faster for the smaller images, so I can start on the next task (feature computation) with those that finish first.
   \end{itemize}
 
-\item Once the costs are computed, the next task is computing the features.
-  \begin{itemize}
-  \item The original plan was to use \href{http://dde.binghamton.edu/download/ensemble/}{JRM}.
-  \item We will instead use a \href{http://dde.binghamton.edu/download/LCLSMR/}{low-complexity linear classifier}, which achieves similar performance but has a lower computational complexity.
-  \end{itemize}
+\item Once the costs are computed, the next task is computing the features using JRM.
 
 \item Then, I'll start by using J-UNIWARD with 0.4 bits per non-zero coefficient. I then need to compute the features of the stego objects. Once this is done, I can train the classifier with the features of all the cover and stego objects.
+  \begin{itemize}
+  \item The original plan was to use the \href{http://dde.binghamton.edu/download/ensemble/}{ensemble classifer}.
+  \item We will instead use a \href{http://dde.binghamton.edu/download/LCLSMR/}{low-complexity linear classifier}, which achieves similar performance but has a lower computational complexity.
+  \end{itemize}
 
 \item When training the classifier, it's important to keep the cover/stego objects pairs together (i.e. not put the cover in the training set and the stego in the testing test for cross-validation).
   \begin{itemize}
@@ -452,6 +452,45 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   1472 & 1104 & 511.460752964 & 8m31s & 01/11/18 \\
   1056 & 792 & 438.49830699 & 7m18s & 01/11/18 \\
   320 & 240 & 359.436480045 & 5m59s & 01/11/18 \\
+  \end{tabular}
+  \end{center}
+
+\item 10/11/18: \texttt{./J-UNIWARD-COSTS -v -I sizeX/cover/} \\
+         \texttt{-O sizeX/cover/ -a 0.4}
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & ?? & ?? \\  % only around 380 processed
+  2912 & 2184 & ?? & ?? \\  % only around 780 processed, still running
+  2720 & 2040 & ?? & ?? \\  % only around 870 processed, still running
+  2528 & 1896 & ?? & ?? \\  % only around 760 processed
+  2304 & 1728 & ?? & ?? \\  % only around 310 processed
+  2048 & 1536 & ?? & ?? \\  % only around 750 processed
+  1792 & 1344 & ?? & ?? \\  % only around 760 processed
+  1472 & 1104 & ?? & ?? \\  % only around 950 processed
+  1056 & 792 & ?? & ?? \\  % only around 1500 processed
+  320 & 240 & 6430.11 & 1h47m \\
+  \end{tabular}
+  \end{center}
+
+  \begin{itemize}
+  \item For some unknown reason, the command for $320 \times 240$ is the only one that finished properly, in the sense that it computed the costs for all $\sim 9500$ images. The commands for the other nine image sizes either stopped mid-execution after computing the costs for a few hundred images, or continue to run without making any progress (which is the case for $2912 \times 2184$ and $2720 \times 2040$, which have been running for 66 hours but have stopped making progress).
+  \end{itemize}
+
+\item 10/11/18: \texttt{compute\_features.py -I sizeX/cover/}
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & 72,282.4331231 & 20h4m \\
+  2912 & 2184 & 63,869.6948001 & 17h44m \\
+  2720 & 2040 & 54,000.526902 & 15h0m \\
+  2528 & 1896 & 40,194.252851 & 11h9m \\
+  2304 & 1728 & 32,157.8610289 & 8h55m \\
+  2048 & 1536 & 30,295.748122 & 8h24m \\
+  1792 & 1344 & 18,653.2866731 & 5h10m \\
+  1472 & 1104 & 14,390.2565191 & 3h59m \\
+  1056 & 792 & 8,721.86998391 & 2h25m \\
+  320 & 240 & 6,430.11 & 1h22m \\
   \end{tabular}
   \end{center}
 
