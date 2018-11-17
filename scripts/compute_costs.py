@@ -1,8 +1,8 @@
 """
 This script runs the hacked J-UNIWARD to compute the costs of all JPEGs in a
-directory. For each image, called "imageX.jpg" say, a file called "imageX.fea"
-is generated. This file contains one line, which starts with the image's
-filename followed by whitespace and then the whitespace-separates features.
+directory. For each image, called "imageX.jpg" say, a file called "imageX.costs"
+is generated. This file contains one cost per line, with costs written in a
+row-by-row fashion.
 """
 
 import argparse
