@@ -24,23 +24,30 @@ def compute_sum(filename):
 # SCRIPT
 start = time.time()
 
-min_sum = -1
-max_sum = -1
+zero_sum_count = 0
+expected_sum_count = 0
+images_with_zero_sum = ''
 
 for filename in os.listdir(args.input_dir):
   name, extension = os.path.splitext(filename)
   if extension == '.fea':
     feature_sum = compute_sum(args.input_dir + filename)
-    if min_sum == -1 and max_sum == -1:  # first feature
-      min_sum = feature_sum
-      max_sum = feature_sum
-    else:
-      min_sum = min(min_sum, feature_sum)
-      max_sum = max(max_sum, feature_sum)
+    if feature_sum == 0:
+      zero_sum_count += 1
+      images_with_zero_sum += filename + '\n'
+    elif 1345.9 < feature_sum and feature_sum < 1346.1:
+      expected_sum_count += 1
 
 end = time.time()
 
-print('Minimum feature sum: ' + str(min_sum))
-print('Maximum feature sum: ' + str(max_sum))
+format_str = '%12s | %8s'
+print(format_str % ('Feature sum', '# images'))
+print('------------------------')
+print(format_str % (0, zero_sum_count))
+print(format_str % (1346, expected_sum_count))
+print('------------------------')
+print(format_str % ('', (zero_sum_count + expected_sum_count)))
 print('------------------------')
 print(str(end-start) + ' seconds elapsed')
+print('------------------------')
+print('Images with feature sum = 0:\n' + images_with_zero_sum)
