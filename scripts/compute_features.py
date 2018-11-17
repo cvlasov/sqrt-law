@@ -11,7 +11,8 @@ import subprocess
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-I", "--input-dir", help="Directory with all images")
+parser.add_argument("-I", "--input-dir", required=True,
+                    help="Directory with all images")
 args = parser.parse_args()
 
 start = time.time()

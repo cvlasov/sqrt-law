@@ -11,8 +11,9 @@ import subprocess
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-I", "--input-dir", help="Directory with all images")
-parser.add_argument("-O", "--output-dir",
+parser.add_argument("-I", "--input-dir", required=True,
+                    help="Directory with all images")
+parser.add_argument("-O", "--output-dir", required=True,
                     help="Directory to save feature files")
 args = parser.parse_args()
 
