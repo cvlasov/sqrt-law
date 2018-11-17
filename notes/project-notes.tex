@@ -76,6 +76,50 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 %-----------------------
 \chapter{Meeting Notes}
 
+\section{14/11/18}
+
+\begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Ran the hacked J-UNIWARD to compute the costs of all the images of all sizes.
+    \begin{itemize}
+    \item It computed the costs of all the $320 \times 240$ images after about 2 hours, but the processes computing the costs for the other sizes either terminated in the middle of their execution (before finishing all images), or did not terminate at all (in the case of $2912 \times 2184$ and $2720 \times 2040$) althought they were not making any progress.
+    \end{itemize}
+
+  \item Wrote \texttt{compute\_features.py}, which runs JRM on all the JPEGs in a directory and saves the results to a \texttt{.fea} file.
+  
+  \item Ran \texttt{compute\_features.py} on all images of all sizes.
+    \begin{itemize}
+    \item All ten processes terminated and processed all images.
+    \item The slowest one took 1h22m and the longest one took 20h4m.
+    \item However, some of the \texttt{.fea} files generated were empty and I don't know why.
+    \end{itemize}
+
+  \item Was sick the last week, so didn't get much else done.
+  \end{itemize}
+
+\item The timing of me running J-UNIWARD and JRM (in parallel) coincided with some issues on the server with regard to memory.
+  \begin{itemize}
+  \item It ended up being restarted, so I should just rerun everything.
+  \item Apparently, JRM does sometimes silently fail. However, when I reran it on some of the images whose features were not computed, it worked which was odd.
+  \end{itemize}
+
+\item It's possible that there was an issue with the simultaneous cost and feature computations because the \texttt{compute\_features.py} iterated through all files in the directory while more files were being generated both by itself and by J-UNIWARD.
+  \begin{itemize}
+  \item When rerunning the computations, I'll modify my script to iterate from 1 to 13349 to ``create'' the image names itself (and check that they actually exist, since not all 13349 images were used), which will avoid any issues with simultaneous directory iteration and file generation.
+  \end{itemize}
+
+\item The sums of the features of each image should be a constant, so it would be a good idea to do a sanity check to ensure that this is indeed the case.
+
+\item To make the cost and feature computations go faster, it would be a good idea to spin off multiple threads (in Python).
+  \begin{itemize}
+  \item For instance, I could spin off 10 threads and make thread 1 handle images with number 1 (mod 10).
+  \end{itemize}
+
+\end{itemize}
+
+
 \section{07/11/18}
 
 \begin{itemize}
@@ -420,6 +464,11 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   \item \texttt{htop}
   \end{itemize}
 
+\item View information on how much RAM is used, available, etc.
+  \begin{itemize}
+  \item texttt{free}
+  \end{itemize}
+
 \end{itemize}
 
 
@@ -493,6 +542,11 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   320 & 240 & 6,430.11 & 1h22m \\
   \end{tabular}
   \end{center}
+
+  \begin{itemize}
+  \item On 15/11/18, I checked the sums of the features to ensure that they all add up to the same constant. This constant turns out to be 1346 for each image's features, regardless of size.
+  \item However, it turns out that several hundred images' features were not computed.
+  \end{itemize}
 
 \end{itemize}
 
