@@ -1,8 +1,9 @@
 """
 This script runs JRM to compute the features of all JPEGs in a directory.
 For each image, called "imageX.jpg" say, a file called "imageX.fea" is
-generated. This file contains one line, which starts with the image's
-filename followed by whitespace and then the whitespace-separated features.
+generated in the same directory. This file contains one line, which starts
+with the image's filename followed by whitespace and then the
+whitespace-separated features.
 """
 
 import argparse
