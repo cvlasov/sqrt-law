@@ -29,7 +29,6 @@ parser.add_argument("-O", "--output-dir", required=True,
 args = parser.parse_args()
 
 start = time.time()
-thread_list = []
 
 for thread_id in range(0,num_threads):
   thread = threading.Thread(target=run, args=(thread_id, ))
