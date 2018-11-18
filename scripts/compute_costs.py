@@ -6,19 +6,20 @@ row-by-row fashion.
 """
 
 import argparse
+from multiprocessing import Pool
 import os
 import subprocess
-import threading
 import time
 
-num_threads = 10
+num_processes = 10
 
-def run(self):
-  for n in range(0,int(13350/num_threads)):
-    image_num = n * num_threads + thread_id
+def run(process_id):
+  for n in range(0,int(13350/num_processes)):
+    image_num = n * num_processes + process_id
     image_partial_path = args.input_dir + 'image' + str(image_num).zfill(5)
     if os.path.isfile(image_partial_path + '.jpg'):
-      subprocess.call('./J-UNIWARD -v -i ' + image_partial_path + '.jpg'
+      print('--> ' + str(process_id) + ' doing ' + str(image_num))
+      subprocess.call('./J-UNIWARD -i ' + image_partial_path + '.jpg'
                       + ' -O ' + args.output_dir + ' -a 0.4', shell=True)
 
 parser = argparse.ArgumentParser()
@@ -29,12 +30,10 @@ parser.add_argument("-O", "--output-dir", required=True,
 args = parser.parse_args()
 
 start = time.time()
-
-for thread_id in range(0,num_threads):
-  thread = threading.Thread(target=run, args=(thread_id, ))
-  thread.start()
-  thread.join()
-
+p = Pool(num_processes)
+p.map(run, range(0,num_processes))
+p.close()
+p.join()
 end = time.time()
 print('\n------------------------\n')
 print(str(end-start) + ' seconds elapsed')
