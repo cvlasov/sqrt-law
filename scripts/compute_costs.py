@@ -18,8 +18,7 @@ def run(process_id):
     image_num = n * num_processes + process_id
     image_partial_path = args.input_dir + 'image' + str(image_num).zfill(5)
     if os.path.isfile(image_partial_path + '.jpg'):
-      print('--> ' + str(process_id) + ' doing ' + str(image_num))
-      subprocess.call('./J-UNIWARD -i ' + image_partial_path + '.jpg'
+      subprocess.call('./J-UNIWARD -v -i ' + image_partial_path + '.jpg'
                       + ' -O ' + args.output_dir + ' -a 0.4', shell=True)
 
 parser = argparse.ArgumentParser()
