@@ -77,18 +77,24 @@ void fillImageVector(std::string dir_name, std::vector<std::string>* images) {
   }
 }
 
-int countDifferentCoefficients(jstruct* cover_struct, jstruct* stego_struct) {
-  int diff_count = 0;
+std::vector<int> countDifferentCoefficients(jstruct* cover_struct,
+                                            jstruct* stego_struct) {
+  std::vector<int> diff_counts(4,0);  // total, +1, -1, other
   for (int row = 0; row < cover_struct->image_height; row++) {
     for (int col = 0; col < cover_struct->image_width; col++) {
-      if (!((row % 8 == 0) && (col % 8 == 0))
-          && (cover_struct->coef_arrays[0]->Read(row, col)
-              != stego_struct->coef_arrays[0]->Read(row,col))) {
-        diff_count++;
+      if (!((row % 8 == 0) && (col % 8 == 0))) {
+        int cover_coef = cover_struct->coef_arrays[0]->Read(row, col);
+        int stego_coef = stego_struct->coef_arrays[0]->Read(row, col);
+        if (cover_coef != stego_coef)  {
+          diff_counts[0]++;
+          if      (cover_coef+1 == stego_coef) diff_counts[1]++;
+          else if (cover_coef-1 == stego_coef) diff_counts[2]++;
+          else                                 diff_counts[3]++;
+        }
       }
     }
   }
-  return diff_count;
+  return diff_counts;
 }
 
 int countNzAC(jstruct* cover_struct) {
@@ -181,7 +187,10 @@ int main(int argc, char** argv) {
     }
 
     if (compare_cover_stego) {
-      std::cout << std::left << std::setw(diff_coef_w) << "Diff coef";
+      std::cout << std::left << std::setw(diff_coef_w) << "# diffs"
+                << std::left << std::setw(diff_coef_w) << "Diff = +1"
+                << std::left << std::setw(diff_coef_w) << "Diff = -1"
+                << std::left << std::setw(diff_coef_w) << "Diff = ?";
     }
 
     std::cout << std::left << std::setw(time_w) << "Time (s)" << std::endl;
@@ -212,9 +221,13 @@ int main(int argc, char** argv) {
 
       if (compare_cover_stego) {
         jstruct* stego_struct = new jstruct(stego_images[imageIndex], true);
-        int diff_coef = countDifferentCoefficients(cover_struct, stego_struct);
-        std::cout << std::left << std::setw(diff_coef_w) << diff_coef;
-        average_diff_coef += diff_coef / cover_images.size();
+        std::vector<int> diff_counts =
+            countDifferentCoefficients(cover_struct, stego_struct);
+        std::cout << std::left << std::setw(diff_coef_w) << diff_counts[0]
+                  << std::left << std::setw(diff_coef_w) << diff_counts[1]
+                  << std::left << std::setw(diff_coef_w) << diff_counts[2]
+                  << std::left << std::setw(diff_coef_w) << diff_counts[3];
+        average_diff_coef += diff_counts[0] / cover_images.size();
         delete stego_struct;
       }
 
