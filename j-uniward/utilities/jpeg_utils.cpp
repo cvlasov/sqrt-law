@@ -33,8 +33,6 @@ February 2013
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "cost_model.h"
-#include "cost_model_config.h"
 #include "exception.hpp"
 #include "jstruct.h"
 
@@ -43,40 +41,107 @@ namespace fs = boost::filesystem;
 namespace po = boost::program_options;
 
 void printInfo() {
-  std::cout << "This program provides a number of utilities related to JPEGs,"
+  std::cout << "This program provides a number of JPEG utilities, "
             << "in particular related to J-UNIWARD embedding."
             << std::endl << std::endl;
-  std::cout << "Author: Catherine Vlasov"
-            << "Original author: Vojtech Holub, e-mail: vojtech_holub@yahoo.com"
+  std::cout << "Author: Catherine Vlasov" << std::endl
+            << "J-UNIWARD author: Vojtech Holub (vojtech_holub@yahoo.com)"
             << std::endl << std::endl;
-  std::cout << "usage: ./JPEG-UTILS [-v] -I input-dir [-z]"
+  std::cout << "Usage: ./JPEG-UTILS [-v] -C cover-dir -S stego-dir [-z] [-d]"
             << std::endl << std::endl;
+}
+
+int checkDirArg(std::string arg_name, std::string arg_val,
+                std::string reason, po::variables_map vm) {
+  if (!vm.count(arg_name)) {
+    std::cout << "'" << arg_name << "' is required to " << reason << "."
+              << std::endl;
+    return 1;
+  } else if (!fs::is_directory(fs::path(arg_val))) {
+    std::cout << "'" << arg_name << "' must be an existing directory."
+              << std::endl;
+    return 1;
+  }
+
+  return 0;
+}
+
+void fillImageVector(std::string dir_name, std::vector<std::string>* images) {
+  fs::directory_iterator end_itr;  // Default construction yields past-the-end
+
+  for (fs::directory_iterator itr(dir_name); itr != end_itr; ++itr) {
+    if ((!fs::is_directory(itr->status()))
+        && (itr->path().extension() == ".jpg")) {
+      images->push_back(itr->path().string());
+    }
+  }
+}
+
+int countDifferentCoefficients(jstruct* cover_struct, jstruct* stego_struct) {
+  int diff_count = 0;
+  for (int row = 0; row < cover_struct->image_height; row++) {
+    for (int col = 0; col < cover_struct->image_width; col++) {
+      if (!((row % 8 == 0) && (col % 8 == 0))
+          && (cover_struct->coef_arrays[0]->Read(row, col)
+              != stego_struct->coef_arrays[0]->Read(row,col))) {
+        diff_count++;
+      }
+    }
+  }
+  return diff_count;
+}
+
+int countNzAC(jstruct* cover_struct) {
+  int nzAC_count = 0;
+  for (int row = 0; row < cover_struct->image_height; row++) {
+    for (int col = 0; col < cover_struct->image_width; col++) {
+      if (!((row % 8 == 0) && (col % 8 == 0))
+          && (cover_struct->coef_arrays[0]->Read(row, col) != 0)) {
+        nzAC_count++;
+      }
+    }
+  }
+  return nzAC_count;
 }
 
 int main(int argc, char** argv) {
   try {
-    std::string input_dir;
+    std::string cover_dir;
+    std::string stego_dir;
     bool verbose = false;
+    bool compare_cover_stego = false;
     bool print_nzAC = false;
 
     po::variables_map vm;
-    std::vector<std::string> images;
+    std::vector<std::string> cover_images;
+    std::vector<std::string> stego_images;
 
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help", "produce help message")
-        ("input-dir,I",
-         po::value<std::string>(&input_dir),
-         "directory with images")
-        ("images,i",
-         po::value<std::vector<std::string> >(&images),
+        ("cover-dir,C",
+         po::value<std::string>(&cover_dir),
+         "directory with cover images")
+        ("cover-images,c",
+         po::value<std::vector<std::string> >(&cover_images),
          "list of cover images")
-        ("nzAC,z",
-         po::bool_switch(&print_nzAC),
-         "print the number of non-zero AC DCT coefficients in each image")
+        ("diff-coef,d",
+         po::bool_switch(&compare_cover_stego),
+         "print the number of AC DCT coefficients that differ in each cover/"
+         "stego image pair")
+        ("help,h", "produce help message")
+        ("stego-dir,S",
+         po::value<std::string>(&stego_dir),
+         "directory with stego images")
+        ("stego-images,s",
+         po::value<std::vector<std::string> >(&stego_images),
+         "list of stego images")
         ("verbose,v",
          po::bool_switch(&verbose),
-         "print out verbose messages");
+         "print verbose messages")
+        ("nzAC,z",
+         po::bool_switch(&print_nzAC),
+         "print the number of non-zero AC DCT coefficients in each cover "
+         "image");
 
     po::positional_options_description p;
 
@@ -90,30 +155,25 @@ int main(int argc, char** argv) {
       return 1;
     }
 
-    if (!vm.count("input-dir")) {
-      std::cout << "'input-dir' is required." << std::endl << desc << std::endl;
-      return 1;
-    } else if (!fs::is_directory(fs::path(input_dir))) {
-      std::cout << "'input-dir' must be an existing directory." << std::endl
-                << desc << std::endl;
+    if (checkDirArg("cover-dir", cover_dir, "run JPEG-UTILS", vm) > 0
+        || checkDirArg("stego-dir", stego_dir, "run JPEG-UTILS", vm) > 0) {
       return 1;
     }
 
-    // Add all JPEG files from the input directory to the vector
-    fs::directory_iterator end_itr;  // Default construction yields past-the-end
+    fillImageVector(cover_dir, &cover_images);
+    fillImageVector(stego_dir, &stego_images);
 
-    if (vm.count("input-dir")) {
-      for (fs::directory_iterator itr(input_dir); itr != end_itr; ++itr) {
-        if ((!fs::is_directory(itr->status()))
-            && (itr->path().extension() == ".jpg")) {
-          images.push_back(itr->path().string());
-        }
-      }
+    if (cover_images.size() != stego_images.size()) {
+      std::cout << "Different number of cover images (" << cover_images.size()
+                << ") and stego images (" << stego_images.size() << ")!"
+                << std::endl;
+      return 1;
     }
 
     int file_name_w = 16;
     int size_w = 11;
     int nzAC_w = 11;
+    int diff_coef_w = 11;
     int time_w = 11;
 
     if (verbose) {
@@ -122,62 +182,86 @@ int main(int argc, char** argv) {
                 << std::left << std::setw(size_w) << "Size";
 
       if (print_nzAC) {
-        std::cout << std::left << std::setw(nzAC_w) << "NzAC"
-                  << std::left << std::setw(time_w) << "Time (s)";
+        std::cout << std::left << std::setw(nzAC_w) << "NzAC";
       }
 
-      std::cout << std::endl;
+      if (compare_cover_stego) {
+        std::cout << std::left << std::setw(diff_coef_w) << "Diff coef";
+      }
+
+      std::cout << std::left << std::setw(time_w) << "Time (s)" << std::endl;
     }
 
     clock_t start = clock();
+    float average_nzAC = 0.0;
+    float average_diff_coef = 0.0;
 
-    cost_model_config* config = new cost_model_config(0.4, verbose, 1, 0, 0);
-    float average_nzAC = 0.0;  // Approximate rolling average
-
-    for (int imageIndex = 0; imageIndex < images.size(); imageIndex++) {
-      fs::path imagePath(images[imageIndex]);
-      jstruct* imageStruct = new jstruct(images[imageIndex], true);
+    for (int imageIndex = 0; imageIndex < cover_images.size(); imageIndex++) {
+      clock_t image_start = clock();
+      fs::path cover_path(cover_images[imageIndex]);
+      jstruct* cover_struct = new jstruct(cover_images[imageIndex], true);
 
       if (verbose) {
         std::stringstream stream;
-        stream << imageStruct->image_height << "x" << imageStruct->image_width;
+        stream << cover_struct->image_height << "x"
+               << cover_struct->image_width;
         std::string dimensions = stream.str();
-        std::string file_name = imagePath.filename().string();
+        std::string file_name = cover_path.filename().string();
         std::cout << std::left << std::setw(file_name_w) << file_name
                   << std::left << std::setw(size_w) << dimensions
                   << std::flush;
       }
 
-      clock_t image_start = clock();
-      base_cost_model* model =
-          (base_cost_model *)new cost_model(imageStruct, config);
-      average_nzAC += model->nzAC / images.size();
+      if (print_nzAC) {
+        int nzAC_count = countNzAC(cover_struct);
+        average_nzAC += nzAC_count / cover_images.size();
+
+        if (verbose) {
+          std::cout << std::left << std::setw(nzAC_w) << nzAC_count;
+        }
+      }
+
+      if (compare_cover_stego) {
+        jstruct* stego_struct = new jstruct(stego_images[imageIndex], true);
+        int diff_coef = countDifferentCoefficients(cover_struct, stego_struct);
+        average_diff_coef += diff_coef / cover_images.size();
+        delete stego_struct;
+
+        if (verbose) {
+          std::cout << std::left << std::setw(diff_coef_w) << diff_coef;
+        }
+      }
+
+      delete cover_struct;
       clock_t image_end = clock();
 
       if (verbose) {
-        if (print_nzAC) {
-          float seconds = \
-              double(((double)image_end - image_start) / CLOCKS_PER_SEC);
-          std::cout << std::left << std::setw(nzAC_w) << model->nzAC
-                    << std::left << std::setw(time_w) << seconds;
-        }
-
-        std::cout << std::endl << std::flush;
+        float seconds =
+            double(((double)image_end - image_start) / CLOCKS_PER_SEC);
+        std::cout << std::left << std::setw(time_w) << seconds
+                  << std::endl << std::flush;
       }
-
-      delete imageStruct;
     }
 
-    delete config;
-    images.clear();
-
+    cover_images.clear();
+    stego_images.clear();
     clock_t end = clock();
 
     if (verbose) {
-      std::cout << std::endl << "------------------------" << std::endl
-                << "Average nzAC: " << int(average_nzAC) << std::endl
+      std::cout << std::endl << "------------------------" << std::endl;
+
+      if (print_nzAC) {
+        std::cout << "Average nzAC: " << int(average_nzAC) << std::endl;
+      }
+
+      if (compare_cover_stego) {
+        std::cout << "Average # of different coefficients: "
+                  << int(average_diff_coef) << std::endl;
+      }
+
+      std::cout << "------------------------" << std::endl
                 << double(((double)end - start) / CLOCKS_PER_SEC)
-                << " seconds elapsed" << std::endl;
+                << " seconds elapsed" << std::endl << std::endl;
     }
 
   } catch (std::exception& e) {
