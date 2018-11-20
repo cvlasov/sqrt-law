@@ -60,8 +60,9 @@ void printInfo() {
             << "into the output-dir." << std::endl << std::endl;
   std::cout << "Original author: Vojtech Holub, e-mail: vojtech_holub@yahoo.com"
             << std::endl << std::endl;
-  std::cout << "usage: J_UNIWARD -I input-dir -O output-dir -a payload_nzAC "
-            << "[-v] [-h STC-height]" << std::endl << std::endl;
+  std::cout << "Usage: J-UNIWARD-EMBED -I input-dir -O output-dir "
+            << "-a payload_nzAC [-v] [-h STC-height]"
+            << std::endl << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -144,18 +145,44 @@ int main(int argc, char** argv) {
     int file_name_w = 16;
     int seed_w = 6;
     int size_w = 11;
-    int time_w = 20;
+    int payload_w = 14;
+    int distortion_w = 17;
+    int loss_w = 10;
+    int trials_w = 10;
 
     if (verbose) {
       std::cout << std::endl;
       std::cout << "J-UNIWARD DISTORTION EMBEDDING SIMULATOR" << std::endl;
-      std::cout << "*Cost Mode* - only computing costs, not doing embedding";
-      std::cout << std::endl << std::endl;
-      std::cout << std::left << std::setw(file_name_w) << "File name"
-                << std::left << std::setw(seed_w)      << "Seed"
-                << std::left << std::setw(size_w)      << "Size"
-                << std::left << std::setw(time_w)      << "Cost model time"
-                << std::endl;
+
+      if (vm.count("input-dir")) {
+        std::cout << "--> Input directory = " << iDir << std::endl;
+      }
+
+      std::cout << "--> Output directory = " << oDir << std::endl;
+      std::cout << "--> Running payload-limited sender with alpha = " << payload
+                << " bits per nzAC" << std::endl;
+
+      if (stc_constr_height == 0) {
+        std::cout << "--> Simulating embedding as if the best coding scheme is "
+                  << "available" << std::endl;
+      } else {
+        std::cout << "--> Using STCs with constraint height h = "
+                  << stc_constr_height << std::endl;
+      }
+
+      std::cout << std::endl;
+      std::cout << std::left << std::setw(file_name_w)  << "File name"
+                << std::left << std::setw(seed_w)       << "Seed"
+                << std::left << std::setw(size_w)       << "Size"
+                << std::left << std::setw(payload_w)    << "Rel. payload"
+                << std::left << std::setw(distortion_w) << "Rel. distortion";
+
+      if (stc_constr_height > 0) {
+        std::cout << std::left << std::setw(loss_w)   << "Coding loss"
+                  << std::left << std::setw(trials_w) << "# STC emb. trials";
+      }
+
+      std::cout << std::endl;
     }
 
     clock_t begin = clock();
@@ -171,9 +198,9 @@ int main(int argc, char** argv) {
       // Load cover
       jstruct* coverStruct = new jstruct(images[imageIndex], true);
 
-      //if (coverStruct->coef_arrays.size() != 1) {
-      //  throw new std::string("Error: Only grayscale images can be embedded.");
-      //}
+      if (coverStruct->coef_arrays.size() != 1) {
+        throw new std::string("Error: Only grayscale images can be embedded.");
+      }
 
       if (verbose) {
         std::stringstream stream;
@@ -187,8 +214,36 @@ int main(int argc, char** argv) {
       }
 
       base_cost_model* model =
-          (base_cost_model *)new cost_model(coverStruct, config,
-                                            coverPath.c_str());
+          (base_cost_model *)new cost_model(coverStruct, config);
+
+      // Embedding
+      float alpha_out = 0;
+      float coding_loss_out = 0;
+      float distortion = 0;
+      unsigned int stc_trials_used = 0;
+      mat2D<int>* cover = coverStruct->coef_arrays[0];
+      coverStruct->coef_arrays[0] =
+          model->Embed(alpha_out, coding_loss_out, stc_trials_used, distortion);
+      delete cover;
+      delete model;
+
+      // Save stego
+      coverStruct->jpeg_write(stegoPath.string(), true);
+
+      if (verbose) {
+        int pixels = coverStruct->image_height * coverStruct->image_width;
+        int rel_distortion = distortion / pixels;
+        std::cout << std::left << std::setw(payload_w)    << alpha_out
+                  << std::left << std::setw(distortion_w) << rel_distortion;
+
+        if (stc_constr_height > 0) {
+          std::cout	<< std::left << std::setw(loss_w)   << coding_loss_out
+                    << std::left << std::setw(trials_w) << stc_trials_used;
+        }
+
+        std::cout << std::endl << std::flush;
+      }
+
       delete coverStruct;
     }
 
@@ -198,7 +253,8 @@ int main(int argc, char** argv) {
     clock_t end = clock();
 
     if (verbose) {
-      std::cout << std::endl << "Time elapsed: "
+      std::cout << "------------------------" << std::endl
+                << std::endl << "Time elapsed: "
                 << double(((double)end - begin) / CLOCKS_PER_SEC) << "s"
                 << std::endl << std::endl;
     }
