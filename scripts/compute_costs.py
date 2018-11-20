@@ -18,7 +18,8 @@ def run(process_id):
     image_num = n * num_processes + process_id
     image_partial_path = args.input_dir + 'image' + str(image_num).zfill(5)
     if os.path.isfile(image_partial_path + '.jpg'):
-      subprocess.call('./J-UNIWARD -v -i ' + image_partial_path + '.jpg'
+      # No -v because printing gets messed up with multiple processes running
+      subprocess.call('./J-UNIWARD-COSTS -i ' + image_partial_path + '.jpg'
                       + ' -O ' + args.output_dir + ' -a 0.4', shell=True)
 
 parser = argparse.ArgumentParser()
@@ -34,5 +35,5 @@ p.map(run, range(0,num_processes))
 p.close()
 p.join()
 end = time.time()
-print('\n------------------------\n')
-print(str(end-start) + ' seconds elapsed')
+print('\n------------------------')
+print(str(end-start) + ' seconds elapsed\n')
