@@ -47,7 +47,7 @@ void printInfo() {
   std::cout << "Author: Catherine Vlasov" << std::endl
             << "J-UNIWARD author: Vojtech Holub (vojtech_holub@yahoo.com)"
             << std::endl << std::endl;
-  std::cout << "Usage: ./JPEG-UTILS [-v] -C cover-dir -S stego-dir [-z] [-d]"
+  std::cout << "Usage: ./JPEG-UTILS -C cover-dir -S stego-dir [-z] [-d]"
             << std::endl << std::endl;
 }
 
@@ -108,7 +108,6 @@ int main(int argc, char** argv) {
   try {
     std::string cover_dir;
     std::string stego_dir;
-    bool verbose = false;
     bool compare_cover_stego = false;
     bool print_nzAC = false;
 
@@ -135,9 +134,6 @@ int main(int argc, char** argv) {
         ("stego-images,s",
          po::value<std::vector<std::string> >(&stego_images),
          "list of stego images")
-        ("verbose,v",
-         po::bool_switch(&verbose),
-         "print verbose messages")
         ("nzAC,z",
          po::bool_switch(&print_nzAC),
          "print the number of non-zero AC DCT coefficients in each cover "
@@ -176,21 +172,19 @@ int main(int argc, char** argv) {
     int diff_coef_w = 11;
     int time_w = 11;
 
-    if (verbose) {
-      std::cout << std::endl;
-      std::cout << std::left << std::setw(file_name_w) << "File name"
-                << std::left << std::setw(size_w) << "Size";
+    std::cout << std::endl;
+    std::cout << std::left << std::setw(file_name_w) << "File name"
+              << std::left << std::setw(size_w) << "Size";
 
-      if (print_nzAC) {
-        std::cout << std::left << std::setw(nzAC_w) << "NzAC";
-      }
-
-      if (compare_cover_stego) {
-        std::cout << std::left << std::setw(diff_coef_w) << "Diff coef";
-      }
-
-      std::cout << std::left << std::setw(time_w) << "Time (s)" << std::endl;
+    if (print_nzAC) {
+      std::cout << std::left << std::setw(nzAC_w) << "NzAC";
     }
+
+    if (compare_cover_stego) {
+      std::cout << std::left << std::setw(diff_coef_w) << "Diff coef";
+    }
+
+    std::cout << std::left << std::setw(time_w) << "Time (s)" << std::endl;
 
     clock_t start = clock();
     float average_nzAC = 0.0;
@@ -201,68 +195,56 @@ int main(int argc, char** argv) {
       fs::path cover_path(cover_images[imageIndex]);
       jstruct* cover_struct = new jstruct(cover_images[imageIndex], true);
 
-      if (verbose) {
-        std::stringstream stream;
-        stream << cover_struct->image_height << "x"
-               << cover_struct->image_width;
-        std::string dimensions = stream.str();
-        std::string file_name = cover_path.filename().string();
-        std::cout << std::left << std::setw(file_name_w) << file_name
-                  << std::left << std::setw(size_w) << dimensions
-                  << std::flush;
-      }
+      std::stringstream stream;
+      stream << cover_struct->image_height << "x"
+             << cover_struct->image_width;
+      std::string dimensions = stream.str();
+      std::string file_name = cover_path.filename().string();
+      std::cout << std::left << std::setw(file_name_w) << file_name
+                << std::left << std::setw(size_w) << dimensions
+                << std::flush;
 
       if (print_nzAC) {
         int nzAC_count = countNzAC(cover_struct);
         average_nzAC += nzAC_count / cover_images.size();
-
-        if (verbose) {
-          std::cout << std::left << std::setw(nzAC_w) << nzAC_count;
-        }
+        std::cout << std::left << std::setw(nzAC_w) << nzAC_count;
       }
 
       if (compare_cover_stego) {
         jstruct* stego_struct = new jstruct(stego_images[imageIndex], true);
         int diff_coef = countDifferentCoefficients(cover_struct, stego_struct);
+        std::cout << std::left << std::setw(diff_coef_w) << diff_coef;
         average_diff_coef += diff_coef / cover_images.size();
         delete stego_struct;
-
-        if (verbose) {
-          std::cout << std::left << std::setw(diff_coef_w) << diff_coef;
-        }
       }
 
       delete cover_struct;
       clock_t image_end = clock();
 
-      if (verbose) {
-        float seconds =
-            double(((double)image_end - image_start) / CLOCKS_PER_SEC);
-        std::cout << std::left << std::setw(time_w) << seconds
-                  << std::endl << std::flush;
-      }
+      float seconds =
+          double(((double)image_end - image_start) / CLOCKS_PER_SEC);
+      std::cout << std::left << std::setw(time_w) << seconds
+                << std::endl << std::flush;
     }
 
     cover_images.clear();
     stego_images.clear();
     clock_t end = clock();
 
-    if (verbose) {
-      std::cout << std::endl << "------------------------" << std::endl;
+    std::cout << std::endl << "------------------------" << std::endl;
 
-      if (print_nzAC) {
-        std::cout << "Average nzAC: " << int(average_nzAC) << std::endl;
-      }
-
-      if (compare_cover_stego) {
-        std::cout << "Average # of different coefficients: "
-                  << int(average_diff_coef) << std::endl;
-      }
-
-      std::cout << "------------------------" << std::endl
-                << double(((double)end - start) / CLOCKS_PER_SEC)
-                << " seconds elapsed" << std::endl << std::endl;
+    if (print_nzAC) {
+      std::cout << "Average nzAC: " << int(average_nzAC) << std::endl;
     }
+
+    if (compare_cover_stego) {
+      std::cout << "Average # of different coefficients: "
+                << int(average_diff_coef) << std::endl;
+    }
+
+    std::cout << "------------------------" << std::endl
+              << double(((double)end - start) / CLOCKS_PER_SEC)
+              << " seconds elapsed" << std::endl << std::endl;
 
   } catch (std::exception& e) {
     std::cerr << "error: " << e.what() << std::endl;
