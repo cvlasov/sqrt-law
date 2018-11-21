@@ -73,8 +73,69 @@ Width & Height & Total pixels \\ \hline
 I wrote a script called \texttt{crop.py} to crop the original cover photos to the sizes computed in Section \ref{subsec:image-sizes}. It takes the desired height and width as well as source and destination directories as commandline arguments. Then it computes where the cropping should start so that $8 \times 8$ blocks are cropped evenly from the top/bottom and left/right and then runs \texttt{jpegtran} to do the cropping on all the images in the given source directory. It took around 6 minutes to crop to the smallest size ($320 \times 240$) and 11 and a half minutes to crop to the second-largest size ($2720 \times 2040$).
 
 
+\subsection{Costs}
+\label{subsec:costs}
+
+TO DO
+
+
+\subsection{Features}
+\label{subsec:features}
+
+TO DO
+
+
 %-----------------------
 \chapter{Meeting Notes}
+
+\section{21/11/18}
+
+\begin{itemize}
+
+\item What I did:
+  \begin{itemize}
+  \item Wrote \texttt{feature\_sanity\_check.py}, which adds up all the features for each image in a directory and outputs how many had the same sum (1346, a constant) and how many had zero sum (due to no features being generated).
+    \begin{itemize}
+    \item Ran it on all image sizes and found that the number of images for which the features weren't generated when I ran JRM on 10/11/18 increased as the image sizes increased.
+    \end{itemize}
+
+  \item Reran \texttt{compute\_features.py} on all images of all sizes.
+     \begin{itemize}
+     \item This time no images were skipped, which is good. However, the timing information was lost because for some reason the terminal output was not redirected to a file by \texttt{nohup}. This may have been caused by the fact that \texttt{nohup} was run by a Bash script for each file size and most likely I forgot the \texttt{\&} at the end of the line. All I know is that all processes finished after around 18-20 hours. This roughly matches the timing information from the original run on 10/11/18 when some images were skipped.
+     \item I reran \texttt{feature\_sanity\_check.py} for all sizes. This confirmed that no images were skipped and that the sum of all features in each image of each size was 1346, as expected.
+     \end{itemize}
+
+  \item Changed \texttt{compute\_costs.py} so that Python's \texttt{multiprocessing} module is used for multithreading in order to spread out the cost computation over multiple processes to speed it up.
+    \begin{itemize}
+    \item I initially tried using Python's \texttt{threading} module, however creating multiple threads does not actually mean the computation is run in parallel due to Python's \href{https://docs.python.org/2/glossary.html\#term-global-interpreter-lock}{global interpreter lock (GIL)}.
+    \item \texttt{multiprocessing}, on the other hand, avoids the limitations of the GIL and allows multiple processes (as opposed to threads) to be created and make use of multiple cores.
+    \item \href{https://stackoverflow.com/a/3046201}{Here} is a good pro/con analysis of the two modules.
+    \end{itemize}
+
+  \item Ran \texttt{compute\_costs.py} on all images of all sizes.
+    \begin{itemize}
+    \item All cost files were generated, as expected.
+    \item The terminal output is messy due to multiple processes printing concurrently. However, the total time is clearly visible on the last line of the terminal output.
+    \end{itemize}
+
+  \item TL;DR the costs and features of all cover images are all computed!
+  
+  \item Wrote my own program called JPEG-UTILS, which is based on the J-UNIWARD code and provides a number of checks and information about cover/stego images.
+    \begin{itemize}
+    \item Currently it provides two utilities:
+      \begin{enumerate}
+      \item Non-zero coefficient count: number of non-zero coefficients in a (cover) image
+      \item Differing coefficients: number of coefficients that differ between cover/stego image pairs, broken down by the number that differ by +1, -1, or something else.      
+      \end{enumerate}
+    \end{itemize}
+
+  \item Looked into how to implement my own binary embedding and it looks like there's no need to reinvent the wheel and the J-UNIWARD code can mostly be reused. Want to discuss.
+  \end{itemize}
+
+\item \textit{Should I rerun the feature computations just to get the timing information? It takes 18-20 hours.}
+
+\end{itemize}
+
 
 \section{14/11/18}
 
@@ -115,6 +176,23 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 \item To make the cost and feature computations go faster, it would be a good idea to spin off multiple threads (in Python).
   \begin{itemize}
   \item For instance, I could spin off 10 threads and make thread 1 handle images with number 1 (mod 10).
+  \end{itemize}
+
+\item Before running experiments, we need to choose constants $r_1, ... , r_4$ in order to compute the number of bits of payload to embed.
+  \begin{itemize}
+  \item Amounts: $r_1, r_2 \cdot \sqrt{n}, r_3 \cdot \sqrt{n} \cdot \log n, r_4 \cdot n$ for each \# of pixels $n$.
+  \item To choose $r_1, ... , r_4$, we do the following:
+    \begin{enumerate}
+    \item Run J-UNIWARD with 0.4 bits per non-zero coefficient for all (or every other) image size.
+    \item Write and run a script that counts the number of coefficients that differ between the cover and stego images.
+    \item From those counts, compute the number of bits that were embedded for each size.
+    \item Compute the features of the stego images.
+    \item Train the classifier with the features of the cover and stego images.
+    \item Run the classifier to determine detectability for each image size.
+    \item ...? CLARIFY
+    \end{enumerate}
+  \item We'll choose $r_1, ... , r_4$ such that the ``middle'' image size is in the ``middle'' among image sizes in terms of detectability. CLARIFY
+  \item Something about number of non-zero coefficients...
   \end{itemize}
 
 \end{itemize}
@@ -171,7 +249,7 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 
 \item Then, I'll start by using J-UNIWARD with 0.4 bits per non-zero coefficient. I then need to compute the features of the stego objects. Once this is done, I can train the classifier with the features of all the cover and stego objects.
   \begin{itemize}
-  \item The original plan was to use the \href{http://dde.binghamton.edu/download/ensemble/}{ensemble classifer}.
+  \item The original plan was to use the \href{http://dde.binghamton.edu/download/ensemble/}{ensemble classifier}.
   \item We will instead use a \href{http://dde.binghamton.edu/download/LCLSMR/}{low-complexity linear classifier}, which achieves similar performance but has a lower computational complexity.
   \end{itemize}
 
@@ -546,6 +624,44 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   \begin{itemize}
   \item On 15/11/18, I checked the sums of the features to ensure that they all add up to the same constant. This constant turns out to be 1346 for each image's features, regardless of size.
   \item However, it turns out that several hundred images' features were not computed.
+  \end{itemize}
+
+\item 17/11/18: \texttt{compute\_costs.py -I sizeX/cover/ -O sizeX/cover/}
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & 202775.362686 & 2d 8h 19m \\
+  2912 & 2184 & 194673.499774 & 2d 6h 4m \\
+  2720 & 2040 & 183598.260891 & 2d 2h 59m \\
+  2528 & 1896 & 172031.831308 & 1d 23h 47m \\
+  2304 & 1728 & 152188.728338 & 1d 18h 16m \\
+  2048 & 1536 & 129785.996801 & 1d 12h 3m \\ 
+  1792 & 1344 & 104988.846009 & 1d 5h 9m \\
+  1472 & 1104 & 74601.1954741 & 10h 43m \\
+  1056 & 792 & 39340.753726 & 10h 55m \\
+  320 & 240 & 3767.95246005 & 1h 2m \\
+  \end{tabular}
+  \end{center}
+
+
+\item 17/11/18: \texttt{compute\_features.py -I sizeX/cover/}
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & ?? & ?? \\
+  2912 & 2184 & ?? & ?? \\
+  2720 & 2040 & ?? & ?? \\
+  2528 & 1896 & ?? & ?? \\
+  2304 & 1728 & ?? & ?? \\
+  2048 & 1536 & ?? & ?? \\ 
+  1792 & 1344 & ?? & ?? \\
+  1472 & 1104 & ?? & ?? \\
+  1056 & 792 & ?? & ?? \\
+  320 & 240 & ?? & ?? \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item Unfortunately the timing information wasn't logged, but as a general idea, all processes finished after around 18-20 hours.
   \end{itemize}
 
 \end{itemize}
