@@ -133,6 +133,85 @@ TO DO
   \end{itemize}
 
 \item \textit{Should I rerun the feature computations just to get the timing information? It takes 18-20 hours.}
+  \begin{itemize}
+  \item I can, but it's not a priority now. I could do it later when I'm running the real experiments.
+  \end{itemize}
+
+\item The \texttt{float* pixel\_costs} in \texttt{cost\_model.cpp} of the J-UNIWARD code looks like it's initialized, filled, and then never used, but its ``initialization'' is actually C pointer arithmetic based on the address of the \texttt{float* costs} which is a field inherited from \texttt{base\_cost\_model.cpp}.
+
+\item Equations for binary versus ternary embedding
+  \begin{enumerate}
+  \item Binary embedding
+    \begin{itemize}
+    \item This is the probability of changing coefficient $i$ by $\pm1$, where $c_i$ is the cost of changing coefficient $i$ (by $\pm1$) and $c_{\neg i} = 0$ is the cost of not changing it:
+      \begin{equation*}
+      \pi_i = \frac{1}{1+e^{\lambda c_i}} = \frac{1}{e^{\lambda c_{\neg i}}+e^{\lambda c_i}} = \frac{e^{-\lambda c_i}}{e^{-\lambda c_{\neg i}}+e^{-\lambda c_i}}
+      \end{equation*}
+    \item Entropy function for coefficient $i$:
+      \begin{equation*}
+      - \pi_i \log \pi_i - (1 - \pi_i) \log (1 - \pi_i)
+      \end{equation*}
+    \end{itemize}
+
+  \item Ternary embedding
+    \begin{itemize}
+    \item This is the probability of changing coefficient $i$ by $+1$ (for example), where $c^0_i = 0$ is the cost of not changing coefficient $i$, $c^{+1}_i$ is the cost of changing it by $+1$, and $c^{-1}_i$ is the cost of changing it by $-1$:
+    \begin{equation*}
+    \pi^{+1}_i = \frac{e^{-\lambda c^{+1}_i}}{1+e^{-\lambda c^{+1}_i}+e^{-\lambda c^{-1}_i}} = \frac{e^{-\lambda c^{+1}_i}}{e^{-\lambda c^0_i}+e^{-\lambda c^{+1}_i}+e^{-\lambda c^{-1}_i}}
+    \end{equation*}
+      \begin{itemize}
+      \item In practice, $c^{+1}_i = c^{-1}_i (= C \text{, say})$ for all $i$, meaning that the costs of adding one versus substracting one are the same, so:
+      \begin{equation*}
+      \pi^{+1}_i =\pi^{-1}_i =  \frac{e^{-\lambda C}}{1+2 \cdot e^{-\lambda C}}
+      \end{equation*}
+      \end{itemize}
+    \item Entropy function for coefficient $i$:
+      \begin{equation*}
+      - \pi^{+1}_i \log \pi^{+1}_i - \pi^{-1}_i \log \pi^{-1}_i - \pi^0_i \log \pi^0_i
+      \end{equation*}
+    \end{itemize}
+  \end{enumerate}
+
+\item \textit{Can I reuse the structure of the J-UNIWARD code to implement binary embedding?}
+  \begin{itemize}
+  \item Yes, but I need to be careful to make sure things are read in the right order and all methods whose implementations are specifically for ternary embedding are adapted to be for binary embedding.
+  \item Specifically, the entropy function and probability computation need to be changed to use the equations described in the point above.
+  \item I also need to adapt it so that it takes a number of bits as an argument instead of the number of bits per non-zero coefficient.
+  \end{itemize}
+
+\item The \href{http://dde.binghamton.edu/kodovsky/pdf/SPIE2012_Kodovsky_Steganalysis_of_JPEG_Images_Using_Rich_Models_paper.pdf}{JRM paper} describes how JRM produces 22,510 features. These are actually made up of two sets of 11,255 features, one for the image itself and one for the same image, but with 4-pixel strips cropped off all sides (``Cartesian calibration'').
+  \begin{itemize}
+  \item The reason the features all add up to the same constant for each image, regardless of size, is that the features are normalized so that they sum to 1. The way JRM computes the features is based on ``submodels'' and all images have the same number of submodels (672) regardless of size.
+  \item The features within each submodel (something like this) are normalized, so summing all the features of both halves (from the two versions of the image), makes a total sum of $672\cdot1 + 672\cdot1 = 1346$, which is what we get when running \texttt{feature\_sanity\_check.py}.
+  \end{itemize}
+
+\item When I run J-UNWIWARD for the pre-experiments, I should actually use 0.1 instead of 0.4 as previously discussed.
+  \begin{itemize}
+  \item For BOSSbase, where all images are $512 \times 512$, $\alpha = 0.2$ produced a ``good'' classification error rate. However, those images are about $\frac{1}{4}$ of a megapixel whereas the middle size images in our dataset are about $3$ megapixels.
+  \end{itemize}
+
+\item Step-by-step explanation of how we'll choose constants $r_1, ... , r_4$ in order to compute the number of bits of payload to embed. \underline{Goal}: pick them such that $r_1 = r_2 \cdot \sqrt{n_{mid}} = r_3 \cdot \sqrt{n_{mid}} \cdot \log n_{mid} = r_4 \cdot n_{mid}$, where $n_{mid}$ is the number of pixels in the ``middle'' image size.
+  \begin{enumerate}
+  \item Run J-UNIWARD with $\alpha = 0.1$ on some of the image sizes (among the smaller half of the sizes).
+  \item Compute the features of these stego images and then train and run the classifier on these cover-stego image pairs.
+  \item Record the classifier's error rate (call it $P_e$) for each image size.
+  \item We want to find an image size where $P_e \approx 20\%$. Using \texttt{JPEG-UTILS}, see how many non-zero coefficients there were on average and then use this and $\alpha = 0.1$ to compute the average number of bits that were embedded (well, simulated).
+  \item Assuming the square root law holds, pro-rate this to compute the number of bits that should be embedded in the middle image size. Call this $m^{\ast}_{mid}$.
+  \item Knowing $m^{\ast}_{mid}$ and $n_{mid}$, compute $r_1, ... , r_4$ so that:
+    \begin{align*}
+    m^{\ast}_{mid} &= r_1 \\
+    m^{\ast}_{mid} &= r_2 \cdot \sqrt{n_{mid}} \\
+    m^{\ast}_{mid} &= r_3 \cdot \sqrt{n_{mid}} \cdot \log n_{mid} \\
+    m^{\ast}_{mid} &= r_4 \cdot n_{mid}
+    \end{align*}
+  \end{enumerate}
+
+\item 95\% confidence interval formula (where $P$ is the error rate and $n$ is the sample size):
+  \begin{equation*}
+  \pm 1.96 \cdot \sqrt{\frac{P \cdot (1-P)}{n}}
+  \end{equation*}
+
+\item We don't need to worry about splitting the data into training, validation, and testing sets. We can let the classifier handle it using its default behaviour. We're not too concerned about doing ``perfect'' machine learning since we can't get many significant figures in our rates in a statistically significant way given that we only have 10,000 images.
 
 \end{itemize}
 
@@ -544,7 +623,7 @@ TO DO
 
 \item View information on how much RAM is used, available, etc.
   \begin{itemize}
-  \item texttt{free}
+  \item \texttt{free}
   \end{itemize}
 
 \end{itemize}
