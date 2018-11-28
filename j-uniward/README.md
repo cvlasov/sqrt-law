@@ -7,3 +7,5 @@ The files in the two sub-directories do not constitute self-contained applicatio
 There are two subdirectories:
 * ```costs```: These files do not do embedding. They only use J-UNIWARD to compute the costs of changing each coefficient in an image and save these costs to a file.
 * ```embedding```: These files do embedding. They behave in the same way as the J-UNIWARD code that can be downloaded straight from the DDE Lab website.
+* ```embed-with-costs```: These files do embedding. They are just like those in ```embedding``` except that they use pre-computed costs rather than computing the costs, as the original J-UNIWARD code does.
+* ```utilities```: This consists of a file called ```jpeg_utils.cpp``` that provides a number of JPEG utilities. It can display the number of coefficients that differ between cover and stego images and by how much they differ (+1, -1, or something else) as well as the number of non-zero coefficients in cover images. This will be expanded as new utilities are needed.
