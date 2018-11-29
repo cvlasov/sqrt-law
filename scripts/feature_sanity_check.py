@@ -49,5 +49,9 @@ print('------------------------')
 print(format_str % ('', (zero_sum_count + expected_sum_count)))
 print('------------------------')
 print(str(end-start) + ' seconds elapsed')
-print('------------------------')
-print('Images with feature sum = 0:\n' + images_with_zero_sum)
+
+if images_with_zero_sum != '':
+  print('------------------------')
+  print('Images with feature sum = 0:\n' + images_with_zero_sum)
+else:
+  print
