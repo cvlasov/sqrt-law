@@ -20,7 +20,6 @@ args = parser.parse_args()
 
 start = time.time()
 subprocess.call('touch ' + args.output_file, shell=True)
-subprocess.call('echo "names F" >> ' + args.output_file, shell=True)
 
 for image_num in range(1,13350):
   image_fea_path = args.input_dir + 'image' + str(image_num).zfill(5) + '.fea'
