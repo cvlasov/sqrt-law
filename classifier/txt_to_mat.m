@@ -31,3 +31,4 @@ save(mat_file, 'features');
 clear features;
 
 exitcode = 0;
+end
