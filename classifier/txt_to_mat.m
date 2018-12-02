@@ -4,7 +4,7 @@
 % fea_file: string with the relative path of the .fea file
 % mat_file: string with the relative path where the .mat file
 %           should be saved
-function exitcode = txt_to_mat(fea_file, mat_file)
+function txt_to_mat(fea_file, mat_file)
 
 % Whitespace is the default separator, so no need to pass
 % a delimiter argument since the feature file is tab-separated.
@@ -30,5 +30,4 @@ features
 save(mat_file, 'features');
 clear features;
 
-exitcode = 0;
 end
