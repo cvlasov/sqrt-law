@@ -57,10 +57,13 @@ void printInfo() {
   std::cout << "This program embeds a payload while minimizing 'J-UNIWARD' "
             << "steganographic distortion to all greyscale 'JPG' images in the "
             << "directory input-dir and saves the stego images into the "
-            << "output-dir. It requires pre-computed J-UNIWARD costs to be "
+            << "output-dir." << std::endl << std::endl;
+  std::cout << "It requires pre-computed J-UNIWARD costs to be "
             << "present in the input-dir in '.costs' files, where each line "
             << "has a single cost as a floating-point number and the costs are "
-            << "in row order." << std::endl << std::endl;
+            << "in row order. If there is an image in the output-dir that has "
+            << "the same filename as a cover image, that cover image is "
+            << "skipped." << std::endl << std::endl;
   std::cout << "Author: Catherine Vlasov" << std::endl
             << "Original author: Vojtech Holub, e-mail: vojtech_holub@yahoo.com"
             << std::endl << std::endl;
@@ -134,11 +137,13 @@ int main(int argc, char** argv) {
     // directory to the vector of image/cost pairs
     std::vector<std::pair<std::string, std::string> > images;
     fs::directory_iterator end_itr;  // Default construction yields past-the-end
+    fs::path output_dir(oDir);
 
     if (vm.count("input-dir")) {
       for (fs::directory_iterator itr(iDir); itr != end_itr; ++itr) {
         if ((!fs::is_directory(itr->status()))
-            && (itr->path().extension() == ".jpg")) {
+            && (itr->path().extension() == ".jpg")
+            && (!fs::exists(oDir / itr->path().filename()))) {
           fs::path cost_file(itr->path());
           cost_file.replace_extension(".costs");
           images.push_back(std::make_pair(itr->path().string(),
