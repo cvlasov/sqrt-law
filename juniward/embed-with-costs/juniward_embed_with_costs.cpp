@@ -59,8 +59,8 @@ void printInfo() {
             << "directory input-dir and saves the stego images into the "
             << "output-dir. It requires pre-computed J-UNIWARD costs to be "
             << "present in the input-dir in '.costs' files, where each line "
-            << "has a single cost as a floating-point number."
-            << std::endl << std::endl;
+            << "has a single cost as a floating-point number and the costs are "
+            << "in row order." << std::endl << std::endl;
   std::cout << "Author: Catherine Vlasov" << std::endl
             << "Original author: Vojtech Holub, e-mail: vojtech_holub@yahoo.com"
             << std::endl << std::endl;
@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
 
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help", "produce help message")
+        ("help,h", "produce help message")
         ("input-dir,I",
          po::value<std::string>(&iDir),
          "directory with the cover images")
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
         ("verbose,v",
          po::bool_switch(&verbose),
          "print out verbose messages")
-        ("STC-height,h",
+        ("STC-height,s",
          po::value<unsigned int>(&stc_constr_height)->default_value(0),
          "0=simulate emb. on bound, >0 constraint height of STC, try 7-12")
         ("random-seed,r",
