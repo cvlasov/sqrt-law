@@ -65,7 +65,7 @@ void printInfo() {
             << "Original author: Vojtech Holub, e-mail: vojtech_holub@yahoo.com"
             << std::endl << std::endl;
   std::cout << "Usage: J-UNIWARD-EMBED-WITH-COSTS -I input-dir -O output-dir "
-            << "-a payload_nzAC [-v] [-h STC-height]"
+            << "-a payload_nzAC [-v] [-s STC-height]"
             << std::endl << std::endl;
 }
 
