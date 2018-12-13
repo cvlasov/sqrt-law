@@ -664,7 +664,7 @@ W    & H    & 1  & 2  & 3  & 4  & 5  & 6  & 7  & 8  & 9  & 10 & 11 \\ \hline
 2528 & 1896 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
 2304 & 1728 & \y & \y & \y &    &    &    &    &    &    &    &    \\
 2048 & 1536 & \y & \y & \y &    &    &    &    &    &    &    &    \\
-1792 & 1344 & \y & \y & \y &    &    &    &    &    &    &    &    \\
+1792 & 1344 & \y & \y & \y & \y & \y & \y &    &    &    &    &    \\
 1472 & 1104 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
 1056 & 792  & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
 320  & 240  & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
@@ -690,43 +690,51 @@ Legend:
 \section{Script Timings}
 \label{sec:script-timings}
 
+\subsection{Initial Curation}
 \begin{itemize}
-
-\item \texttt{initial\_curation.py} (before I changed constants to command-line arguments)
+\item 30/10/18: \texttt{initial\_curation.py} (before I changed constants to \\
+         command-line arguments)
   \begin{itemize}
-  \item $1131.18478608s \approx 18m51s$ (30/10/18)
+  \item $1131.18478608s \approx 18m51s$
   \end{itemize}
 
-\item \texttt{initial\_curation.py --from-dir original/} \\ \texttt{--to-dir size3072/cover/}
+\item 01/11/18: \texttt{initial\_curation.py --from-dir original/} \\ \texttt{--to-dir size3072/cover/}
   \begin{itemize}
-  \item $655.185225964s \approx 10m55s$ (01/11/18)
+  \item $655.185225964s \approx 10m55s$
   \end{itemize}
+\end{itemize}
 
-\item \texttt{crop.py --from-dir size3072/cover --to-dir sizeW/cover/} \\
-         \texttt{ --width W --height H}, where:
+
+\subsection{Cropping}
+\begin{itemize}
+\item 01/11/18: \texttt{crop.py --from-dir size3072/cover} \\
+         \texttt{--to-dir sizeW/cover/ --width W --height H}, where:
   \begin{center}
-  \begin{tabular}{ c c | c c | c }
-  W & H & Seconds & Approx. Time & Date\\ \hline
-  2912 & 2184 & 689.414359808 & 11m29s & 01/11/18 \\
-  2720 & 2040 & 662.552460909 & 11m02s & 01/11/18 \\
-  2528 & 1896 & 662.54279089 & 11m02s & 01/11/18 \\
-  2304 & 1728 & 632.872202158 & 10m32s & 01/11/18 \\
-  2048 & 1536 & 605.926501989 & 10m05s & 01/11/18 \\
-  1792 & 1344 & 555.097690105 & 9m15s & 01/11/18 \\
-  1472 & 1104 & 511.460752964 & 8m31s & 01/11/18 \\
-  1056 & 792 & 438.49830699 & 7m18s & 01/11/18 \\
-  320 & 240 & 359.436480045 & 5m59s & 01/11/18 \\
+  \begin{tabular}{ c c | c c }
+  W & H & Seconds & Approx. Time\\ \hline
+  2912 & 2184 & 689.414359808 & 11m29s \\
+  2720 & 2040 & 662.552460909 & 11m02s \\
+  2528 & 1896 & 662.54279089 & 11m02s \\
+  2304 & 1728 & 632.872202158 & 10m32s \\
+  2048 & 1536 & 605.926501989 & 10m05s \\
+  1792 & 1344 & 555.097690105 & 9m15s \\
+  1472 & 1104 & 511.460752964 & 8m31s \\
+  1056 & 792 & 438.49830699 & 7m18s \\
+  320 & 240 & 359.436480045 & 5m59s \\
   \end{tabular}
   \end{center}
+\end{itemize}
 
+\subsection{Costs}
+\begin{itemize}
 \item 10/11/18: \texttt{./J-UNIWARD-COSTS -v -I sizeX/cover/} \\
          \texttt{-O sizeX/cover/ -a 0.4}
   \begin{center}
   \begin{tabular}{ c c | c c }
   Width & Height & Seconds & Approx. Time \\ \hline
   3072 & 2304 & ?? & ?? \\  % only around 380 processed
-  2912 & 2184 & ?? & ?? \\  % only around 780 processed, still running
-  2720 & 2040 & ?? & ?? \\  % only around 870 processed, still running
+  2912 & 2184 & ?? & ?? \\  % only around 780 processed
+  2720 & 2040 & ?? & ?? \\  % only around 870 processed
   2528 & 1896 & ?? & ?? \\  % only around 760 processed
   2304 & 1728 & ?? & ?? \\  % only around 310 processed
   2048 & 1536 & ?? & ?? \\  % only around 750 processed
@@ -738,9 +746,29 @@ Legend:
   \end{center}
 
   \begin{itemize}
-  \item For some unknown reason, the command for $320 \times 240$ is the only one that finished properly, in the sense that it computed the costs for all $\sim 9500$ images. The commands for the other nine image sizes either stopped mid-execution after computing the costs for a few hundred images, or continue to run without making any progress (which is the case for $2912 \times 2184$ and $2720 \times 2040$, which have been running for 66 hours but have stopped making progress).
+  \item For some unknown reason, the command for $320 \times 240$ is the only one that finished properly, in the sense that it computed the costs for all $\sim 9500$ images. The commands for the other nine image sizes either stopped mid-execution after computing the costs for a few hundred images, or continued running without making any progress (which is the case for $2912 \times 2184$ and $2720 \times 2040$, which ran for over 70 hours but stopped making progress).
   \end{itemize}
 
+\item 17/11/18: \texttt{compute\_costs.py -I sizeX/cover/ -O sizeX/cover/}
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & 202775.362686 & 2d 8h 19m \\
+  2912 & 2184 & 194673.499774 & 2d 6h 4m \\
+  2720 & 2040 & 183598.260891 & 2d 2h 59m \\
+  2528 & 1896 & 172031.831308 & 1d 23h 47m \\
+  2304 & 1728 & 152188.728338 & 1d 18h 16m \\
+  2048 & 1536 & 129785.996801 & 1d 12h 3m \\
+  1792 & 1344 & 104988.846009 & 1d 5h 9m \\
+  1472 & 1104 & 74601.1954741 & 10h 43m \\
+  1056 & 792 & 39340.753726 & 10h 55m \\
+  320 & 240 & 3767.95246005 & 1h 2m \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Cover Features}
+\begin{itemize}
 \item 10/11/18: \texttt{compute\_features.py -I sizeX/cover/}
   \begin{center}
   \begin{tabular}{ c c | c c }
@@ -763,24 +791,6 @@ Legend:
   \item However, it turns out that several hundred images' features were not computed.
   \end{itemize}
 
-\item 17/11/18: \texttt{compute\_costs.py -I sizeX/cover/ -O sizeX/cover/}
-  \begin{center}
-  \begin{tabular}{ c c | c c }
-  Width & Height & Seconds & Approx. Time \\ \hline
-  3072 & 2304 & 202775.362686 & 2d 8h 19m \\
-  2912 & 2184 & 194673.499774 & 2d 6h 4m \\
-  2720 & 2040 & 183598.260891 & 2d 2h 59m \\
-  2528 & 1896 & 172031.831308 & 1d 23h 47m \\
-  2304 & 1728 & 152188.728338 & 1d 18h 16m \\
-  2048 & 1536 & 129785.996801 & 1d 12h 3m \\ 
-  1792 & 1344 & 104988.846009 & 1d 5h 9m \\
-  1472 & 1104 & 74601.1954741 & 10h 43m \\
-  1056 & 792 & 39340.753726 & 10h 55m \\
-  320 & 240 & 3767.95246005 & 1h 2m \\
-  \end{tabular}
-  \end{center}
-
-
 \item 17/11/18: \texttt{compute\_features.py -I sizeX/cover/}
   \begin{center}
   \begin{tabular}{ c c | c c }
@@ -800,8 +810,70 @@ Legend:
   \begin{itemize}
   \item Unfortunately the timing information wasn't logged, but as a general idea, all processes finished after around 18-20 hours.
   \end{itemize}
-
 \end{itemize}
+
+\subsection{$J_{0.1}$ Features}
+\begin{itemize}
+\item \texttt{compute\_features.py -I sizeX/stego-juni-01/}
+  \begin{center}
+  \begin{tabular}{ c c | c c c }
+  Width & Height & Seconds & Approx. Time & Date \\ \hline
+  2304 & 1728 & ?? & ?? & ?? \\
+  2048 & 1536 & ?? & ?? & ?? \\
+  1792 & 1344 & 8581.41911697 & 2h23m & 12/12/18 \\
+  1472 & 1104 & 8461.04521799 & 2h21m & 02/12/18 \\
+  1056 & 792 & 5645.03076911 & 1h34m & 02/12/18 \\
+  320 & 240 & 735.175777912 & 12m & 29/11/18 \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item Only the six smallest image sizes were used.
+  \end{itemize}
+\end{itemize}
+
+\subsection{$J_{0.1}$ Feature Matrix}
+\begin{itemize}
+\item First step: \texttt{combine\_feature\_files.py -I sizeX/stego-juni-01/} \\
+         \texttt{-O features/sizeX\_juni\_01.fea}
+  \begin{center}
+  \begin{tabular}{ c c | c c c }
+  Width & Height & Seconds & Approx. Time & Date \\ \hline
+  2304 & 1728 & ?? & ?? & ?? \\
+  2048 & 1536 & ?? & ?? & ?? \\
+  1792 & 1344 & 80.3196239471 & 1m & 13/12/18 \\
+  1472 & 1104 & 199.391219139 & 3m & 12/12/18 \\
+  1056 & 792 & 199.67672205 & 3m & 02/12/18 \\
+  320 & 240 & ?? & ?? & ?? \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item Some timing information missing.
+  \end{itemize}
+
+\item Second step: \texttt{./run\_txt\_to\_mat.sh /usr/local/matlab-r2014a/} \\
+         \texttt{features/sizeX\_juni\_01.fea features/sizeX\_juni\_01.mat}
+  \begin{itemize}
+  \item My \texttt{txt\_to\_mat.m} MATLAB script doesn't produce timing information.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Linear Classifier on Cover and $J_{0.1}$}
+\begin{itemize}
+\item \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\
+         \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_01.mat}
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & MinPE & Seconds & Approx. Time & Date \\ \hline
+  2304 & 1728 & ?? & ?? & ?? & ?? \\
+  2048 & 1536 & ?? & ?? & ?? & ?? \\
+  1792 & 1344 & ?? & ?? & ?? & ?? \\
+  1472 & 1104 & 0.4208 & 413.5771 & 6m & 12/12/18 \\
+  1056 & 792 & 0.4386 & 829.9007 & 13m & 10/12/18 \\
+  320 & 240 & 0.4780 & 994.2325 & 16m & 02/12/18 \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
 
 \section{Lessons Learned}
 \label{sec:lessons-learned}
