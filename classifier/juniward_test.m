@@ -104,15 +104,6 @@ TST_stego = S(testing_set,:);
 % Train and Test using the linear classifier with all default settings
 [Results] = LCLSMR (TRN_cover, TRN_stego, TST_cover, TST_stego, true);
 
-% ROC curve can be obtained using the following code
-figure;grid on;hold on;
-plot(Results.PFA, 1-Results.PMD)
-xlabel('P_{FA}');
-ylabel('P_D');
-title(sprintf('P_E = %.4f',Results.PE))
-[~ , Ind] = min((Results.PFA + Results.PMD)/2);
-plot(Results.PFA(Ind),1-Results.PMD(Ind),'or')
-
 % That's pretty much it. For reporting steganalysis results, it is a good
 % habit to repeat the experiment several times (for example 10 times) for
 % different training/testing splits.
