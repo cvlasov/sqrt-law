@@ -28,7 +28,8 @@ m_1056 = alpha * nz_coef  # Average number of bits embedded per image
 
 n_mid = 2048 * 1536                    # Number of pixels per middle-size image
 m_mid = m_1056 * sqrt(n_mid / n_1056)  # Number of bits to embed per middle-size
-                                       # image
+                                       # image, assuming the square root law
+                                       # holds
 
 # Constants used for computing the specific numbers of bits to embed, which are
 # O(1), O(sqrt(n)), O(sqrt(n)*log(n)), and O(n), respectively, where n is the
@@ -39,9 +40,9 @@ r3 = m_mid / (sqrt(n_mid) * log(n_mid))
 r4 = m_mid / n_mid
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--output-file", required=True,
+parser.add_argument('-o', '--output-file', required=True,
                     type=argparse.FileType('w'),
-                    help="Path and name of generated file with payload sizes")
+                    help='Path and name of generated file with payload sizes')
 args = parser.parse_args()
 
 start = time.time()
@@ -50,12 +51,14 @@ for (w,h) in sizes:
   n = w * h  # Number of pixels
   values = [w, h, n, r1, r2*sqrt(n), r3*sqrt(n)*log(n,2), r4*n]
   values = map(lambda x: str(int(x)), values)
-  args.output_file.write(" & ".join(values) + " \\\\\n")
+  args.output_file.write(' & '.join(values) + ' \\\\\n')
 
 end = time.time()
-print('r1 =', r1)
-print('r2 =', r2)
-print('r3 =', r3)
-print('r4 =', r4)
+
+args.output_file.write('\n')
+args.output_file.write('r1 = ' + str(r1) + '\n')
+args.output_file.write('r2 = ' + str(r2) + '\n')
+args.output_file.write('r3 = ' + str(r3) + '\n')
+args.output_file.write('r4 = ' + str(r4) + '\n')
 print('\n------------------------')
 print(str(end-start) + ' seconds elapsed\n')
