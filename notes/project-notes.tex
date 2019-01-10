@@ -92,16 +92,78 @@ TO DO
 %-----------------------
 \chapter{Meeting Notes}
 
+\section{11/01/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Finished running J-UNIWARD on...
+      \item Picked values for $r_1, r_2, r_3, r_4$.
+        \begin{itemize}
+          \item The image size and $\alpha$ combination that produced a MinPE value closest to 20\% was $1056\times792$ with $\alpha=0.3$ (MinPE = 22\%).
+          \item I ran \texttt{JPEG-UTILS} on all the $1056\times792$ images and found that the average number of non-zero coefficients was $120,746$.
+          \item Since 0.3 bits per non-zero coefficient were embedded in each image, this means that an average of $0.3 \times 120,746 = 36,224$ bits were embedded per image.
+          \item I chose $2048 \times 1536$ to be the "middle" image size. There are ten sizes, so it was either this or $2304 \times 1728$.
+          \item I wrote a script \texttt{calculate\_payload\_sizes.py} that computes the number of bits that should be embedded for each image size for each proportion (i.e. $O(1)$, $O(\sqrt{n})$, $O(\sqrt{n} \cdot \log n)$, and $O(n)$, where $n$ is the number of pixels in each image).
+          \item Compute the constant values computed as intermediate values by my script are:
+            \begin{itemize}
+              \item $r_1 = 70252.21818181817$
+              \item $r_2 = 39.609508865665084$
+              \item $r_3 = 2.64741910071112$
+              \item $r_4 = 0.022332578716856056$
+            \end{itemize}
+          \item Using these constants, compute the number of bits to embed for each image size:
+          \begin{center}
+            \begin{tabular}{ c c c | c c c c }
+            Width & Height & Pixels & $O(1)$ & $O(\sqrt{n})$ & $O(\sqrt{n} \cdot \log n)$ & $O(n)$ \\ \hline
+            3072 & 2304 & 7077888 & 70252 & 105378 & 160268 & 158067 \\
+            2912 & 2184 & 6359808 & 70252 & 99889 & 150891 & 142030 \\
+            2720 & 2040 & 5548800 & 70252 & 93303 & 139714 & 123919 \\
+            2528 & 1896 & 4793088 & 70252 & 86717 & 128628 & 107042 \\
+            2304 & 1728 & 3981312 & 70252 & 79033 & 115816 & 88912 \\
+            2048 & 1536 & 3145728 & 70252 & 70252 & 101352 & 70252 \\
+            1792 & 1344 & 2408448 & 70252 & 61470 & 87100 & 53786 \\
+            1472 & 1104 & 1625088 & 70252 & 50493 & 69631 & 36292 \\
+            1056 & 792 & 836352 & 70252 & 36223 & 47632 & 18677 \\
+            320 & 240 & 76800 & 70252 & 10976 & 11906 & 1715 \\
+            \end{tabular}
+          \end{center}
+        \end{itemize}
+    \end{itemize}
+
+\end{itemize}
+
 \section{03/12/18}
 
 \begin{itemize}
 
 \item What I did:
   \begin{itemize}
-  \item
+  \item Found a way to convert the features in the \texttt{imageXXXXX.fea} files into a format that the linear classifier can use.
+    \begin{itemize}
+    \item Wrote \texttt{combine\_feature\_files.py}, which creates a single file (e.g. \texttt{sizeX\_cover.fea}) with the features of all the images in a directory, one image per line. Each line is tab-separated and has the image name followed by the features (in row order).
+    \item Wrote \texttt{txt\_to\_mat.m}, which takes a combined feature file and produces a \texttt{.mat} file that MATLAB can read to get the features in fields with names (and dimensions) that it expects.
+    \end{itemize}
+
+  \item Ran (ternary) J-UNIWARD embedding with $\alpha = 0.1$ on the six smallest image sizes.
+    \begin{itemize}
+    \item Realized that I wasn't reusing the J-UNIWARD costs I had previously computed, so I killed the processes that hadn't terminated yet (sizes  $1792 \times 1344, 2048 \times 1536, 2304 \times 1728$)
+    \end{itemize}
+
+  \item Created a modified J-UNIWARD that reads in the pre-computed costs from the \texttt{imageX.costs} files in the cover image directory.
+    \begin{itemize}
+    \item Started running this on the sizes that hadn't terminated without reusing costs.
+    \item Sizes $1792 \times 1344, 2048 \times 1536, 2304 \times 1728$ haven't terminated yet although they've been running for several days.
+    \end{itemize}
+
+  \item Ran \texttt{compute\_features.py} on $J_{0.1}$ images (sizes $320 \times 240, 1056 \times 792, 1472 \times 1104$).
+  
+  \item Started working on modifying J-UNIWARD to do binary embedding.
   \end{itemize}
 
 \end{itemize}
+
 
 \section{21/11/18}
 
@@ -663,8 +725,8 @@ W    & H    & 1  & 2  & 3  & 4  & 5  & 6  & 7  & 8  & 9  & 10 & 11 \\ \hline
 2912 & 2184 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
 2720 & 2040 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
 2528 & 1896 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
-2304 & 1728 & \y & \y & \y & \y & \y & \y &    &    &    &    &    \\
-2048 & 1536 & \y & \y & \y & \y & \y & \y &    &    &    &    &    \\
+2304 & 1728 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
+2048 & 1536 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
 1792 & 1344 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
 1472 & 1104 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
 1056 & 792  & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
@@ -816,7 +878,7 @@ Legend:
 
 \subsection{\Jtern Embedding}
 \begin{itemize}
-\item \texttt{./JUNIWARD-EMBED-WITH-COSTS -v -I sizeX/cover} \\
+\item \texttt{./J-UNIWARD-EMBED-WITH-COSTS -v -I sizeX/cover} \\
          \texttt{-O sizeX/stego-juni-01 -a 0.1}
   \begin{center}
   \begin{tabular}{ c c | c c c }
@@ -881,10 +943,10 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{Linear Classifier on Cover and \Jtern}
+\subsection{Linear Classifier on Cover and \Jtern} \label{j01-classifier}
 \begin{itemize}
 \item \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\
-         \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_01.mat}
+         \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_0X.mat}
   \begin{center}
   \begin{tabular}{ c c | c | c c c }
   Width & Height & MinPE & Seconds & Approx. Time & Date \\ \hline
@@ -894,6 +956,82 @@ Legend:
   1472 & 1104 & 0.4208 & 413.5771 & 6m & 12/12/18 \\
   1056 & 792 & 0.4386 & 829.9007 & 13m & 10/12/18 \\
   320 & 240 & 0.4780 & 994.2325 & 16m & 02/12/18 \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Other Embedding}
+\begin{itemize}
+\item Since none of the MinPE values in Section \ref{j01-classifier} were quite low enough, I ran the embedding again on a subset of the sizes with some other values of $\alpha$.
+\item \texttt{./J-UNIWARD-EMBED-WITH-COSTS -v -I sizeX/cover} \\
+         \texttt{-O sizeX/stego-juni-01 -a alpha}, where \texttt{alpha} is:
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & ? & ? & 04/01/19 \\
+  1056 & 792 & 0.4 & 31621.6 & 8h47m & 14/12/18 \\
+  320 & 240 & 0.3 & 3316.72 & 55m & 14/12/18 \\
+  320 & 240 & 0.4 & 3307.1 & 55m & 14/12/18 \\
+  320 & 240 & 0.5 & 3305.58 & 55m & 14/12/18 \\
+  320 & 240 & 0.6 & ? & ? & 03/01/19 \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+    \item Timing information for $320 \times 240$ ($\alpha = 0.6$) and $1056 \times 792$ ($\alpha = 0.3$) is missing.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Other Features}
+\begin{itemize}
+\item \texttt{compute\_features.py -I sizeX/stego-juni-0X/}
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 7923.50714922 & 2h12m & 04/01/19 \\
+  1056 & 792 & 0.4 & 3425.78458905.6 & 57m & 14/12/18 \\
+  320 & 240 & 0.3 & 1459.43398404 & 24m & 14/12/18 \\
+  320 & 240 & 0.4 & 1461.83910203 & 24m & 14/12/18 \\
+  320 & 240 & 0.5 & 1459.43398404 & 24m & 14/12/18 \\
+  320 & 240 & 0.6 & 2298.33446884 & 24m & 04/01/19 \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Other Feature Matrix}
+\begin{itemize}
+\item First step: \texttt{combine\_feature\_files.py -I sizeX/stego-juni-0X/} \\
+         \texttt{-O features/sizeX\_juni\_0X.fea}
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 55.0291929245 & 55s & 08/01/19 \\
+  1056 & 792 & 0.4 & 49.0757801533 & 49s & 14/12/18 \\
+  320 & 240 & 0.3 & 266.531414986 & 4m & 14/12/18 \\
+  320 & 240 & 0.4 & 295.562961817 & 4m & 14/12/18 \\
+  320 & 240 & 0.5 & 289.210170031 & 4m & 14/12/18 \\
+  320 & 240 & 0.6 & 113.729305029 & 1m & 04/01/19 \\
+  \end{tabular}
+  \end{center}
+
+\item Second step: \texttt{./run\_txt\_to\_mat.sh /usr/local/matlab-r2014a/} \\
+         \texttt{features/sizeX\_juni\_0X.fea features/sizeX\_juni\_0X.mat}
+  \begin{itemize}
+  \item My \texttt{txt\_to\_mat.m} script doesn't produce timing information.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Linear Classifier on Cover and Other Embedding}
+\begin{itemize}
+\item \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\
+         \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_0X.mat}
+  \begin{center}
+  \begin{tabular}{ c c | c | c | c c c }
+  Width & Height & $\alpha$ & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 0.2249 & 926.3549 & 15m & 08/01/19 \\
+  1056 & 792 & 0.4 & 0.1297 & 572.7521 & 9m & 15/12/18 \\
+  320 & 240 & 0.3 & 0.3997 & 1075.703 & 17m & 15/12/18 \\
+  320 & 240 & 0.4 & 0.3500 & 1047.573 & 17m & 15/12/18 \\
+  320 & 240 & 0.5 & 0.2791 & 1127.515 & 18m & 15/12/18 \\
   \end{tabular}
   \end{center}
 \end{itemize}
