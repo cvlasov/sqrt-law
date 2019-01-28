@@ -6,6 +6,8 @@ O(sqrt(n)*log(n)), and O(n) in the total number n of pixels in each image size.
 
 The file is formatted so that the contents can be copy-pasted into a LaTeX
 file inside a "tabular" environment.
+
+Only works with Python3 due to the second parameter to the log function.
 """
 
 import argparse
