@@ -114,7 +114,7 @@ float calculate_lambda_from_payload(
   // This "error" factor is necessary due to a lack of floating-point precision
   // during the binary search. The entropy sum may never be able to reach the
   // range [bits...bits+1), so this requirement is relaxed a bit.
-  int error = 2;
+  int error = 5;
 
   while (lower_bound <= upper_bound) {
     lambda = (upper_bound + lower_bound) / 2;
