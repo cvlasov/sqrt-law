@@ -70,6 +70,8 @@ int main(int argc, char** argv) {
     int payload_bits;
     bool verbose = false;
     int randSeed;
+    bool partition = false;
+    std::string digit;
 
     po::variables_map vm;
 
@@ -82,7 +84,7 @@ int main(int argc, char** argv) {
         ("output-dir,O",
          po::value<std::string>(&oDir),
          "directory to output stego images")
-        ("payload_bits,b",
+        ("payload-bits,b",
          po::value<int>(&payload_bits),
          "payload to embed in bits")
         ("verbose,v",
@@ -90,7 +92,14 @@ int main(int argc, char** argv) {
          "print out verbose messages")
         ("random-seed,r",
          po::value<int>(&randSeed)->default_value(0),
-         "default=0 (every time different)");
+         "default=0 (every time different)")
+        ("partition,p",
+         po::bool_switch(&partition),
+         "embed images with numbers ending in the digit given by the 'digit' "
+         "flag")
+        ("digit,d",
+         po::value<std::string>(&digit)->default_value(""),
+         "string containing a single digit (used by the 'partition' flag)");
 
     po::positional_options_description p;
 
@@ -114,6 +123,12 @@ int main(int argc, char** argv) {
       return 1;
     }
 
+    if (vm.count("partition") && !vm.count("digit")) {
+      std::cout << "'partition' is set, so 'digit' is required." << std::endl
+                << desc << std::endl;
+      return 1;
+    }
+
     // Add all JPEG files (and corresponding cost files) from the input
     // directory to the vector of image/cost pairs
     std::vector<std::pair<std::string, std::string> > images;
@@ -132,6 +147,16 @@ int main(int argc, char** argv) {
         if ((!fs::is_directory(itr->status()))
             && (itr->path().extension() == ".jpg")
             && (!fs::exists(oDir / itr->path().filename()))) {
+          // If this process is only supposed to embed a subset of the cover
+          // images, we need to check whether this image is in the subset by
+          // looking at the last digit of its image number.
+          if (partition) {
+            std::string stem = itr->path().stem().string();
+            if (stem.substr(stem.length()-1,1) != digit) {
+              continue;  // Skip this image
+            }
+          }
+
           fs::path cost_file(itr->path());
           cost_file.replace_extension(".costs");
           images.push_back(std::make_pair(itr->path().string(),
