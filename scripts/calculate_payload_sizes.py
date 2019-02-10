@@ -7,7 +7,8 @@ O(sqrt(n)*log(n)), and O(n) in the total number n of pixels in each image size.
 The file is formatted so that the contents can be copy-pasted into a LaTeX
 file inside a "tabular" environment.
 
-Only works with Python3 due to the second parameter to the log function.
+Only works with Python3 due to the second parameter to the log function, which
+indicates the base of the logarithm and was introduced in Python3.
 """
 
 import argparse
@@ -38,7 +39,7 @@ m_mid = m_1056 * sqrt(n_mid / n_1056)  # Number of bits to embed per middle-size
 # number of pixels.
 r1 = m_mid
 r2 = m_mid / sqrt(n_mid)
-r3 = m_mid / (sqrt(n_mid) * log(n_mid))
+r3 = m_mid / (sqrt(n_mid) * log(n_mid,2))
 r4 = m_mid / n_mid
 
 parser = argparse.ArgumentParser()
