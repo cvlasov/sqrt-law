@@ -20,7 +20,8 @@ start = time.time()
 
 for image_num in range(1,13350):
   image_partial_path = args.input_dir + 'image' + str(image_num).zfill(5)
-  if os.path.isfile(image_partial_path + '.jpg'):
+  if os.path.isfile(image_partial_path + '.jpg') and \
+      not os.path.isfile(image_partial_path + '.fea'):
     subprocess.call('./jrm -a ' + image_partial_path + '.jpg'
                     + ' > ' + image_partial_path + '.fea', shell=True)
 
