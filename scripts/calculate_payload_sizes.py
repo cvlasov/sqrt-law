@@ -49,19 +49,29 @@ parser.add_argument('-o', '--output-file', required=True,
 args = parser.parse_args()
 
 start = time.time()
+coefficients = [0.7, 1.0, 1.3]
 
-for (w,h) in sizes:
-  n = w * h  # Number of pixels
-  values = [w, h, n, r1, r2*sqrt(n), r3*sqrt(n)*log(n,2), r4*n]
-  values = map(lambda x: str(int(x)), values)
-  args.output_file.write(' & '.join(values) + ' \\\\\n')
+for c in coefficients:
+  args.output_file.write('PAYLOADS * {}\n'.format(c))
+  args.output_file.write('\\begin{tabular}{ c c c | c c c c }\n')
+  args.output_file.write('Width & Height & Pixels & $O(1)$ & $O(\sqrt{n})$ & $O(\sqrt{n} \cdot \log n)$ & $O(n)$ \\\\ \hline\n')
+  for (w,h) in sizes:
+    n = w * h  # Number of pixels
+    values = [w, h, n, c*r1, c*r2*sqrt(n), c*r3*sqrt(n)*log(n,2), c*r4*n]
+    values = map(lambda x: str(int(x)), values)
+    args.output_file.write(' & '.join(values) + ' \\\\\n')
+  args.output_file.write('\end{tabular}\n\n')
 
 end = time.time()
 
-args.output_file.write('\n')
-args.output_file.write('r1 = ' + str(r1) + '\n')
-args.output_file.write('r2 = ' + str(r2) + '\n')
-args.output_file.write('r3 = ' + str(r3) + '\n')
-args.output_file.write('r4 = ' + str(r4) + '\n')
+args.output_file.write('CONSTANTS\n')
+args.output_file.write('\\begin{tabular}{ c | c c c }\n')
+args.output_file.write('& $-30\%$ & Original & $+30\%$ \\\\ \\hline\n')
+args.output_file.write('r1 & {} & {} & {} \\\\\n'.format(r1*0.7, r1, r1*1.3))
+args.output_file.write('r2 & {} & {} & {} \\\\\n'.format(r2*0.7, r2, r2*1.3))
+args.output_file.write('r3 & {} & {} & {} \\\\\n'.format(r3*0.7, r3, r3*1.3))
+args.output_file.write('r4 & {} & {} & {} \\\\\n'.format(r4*0.7, r4, r4*1.3))
+args.output_file.write('\end{tabular}\n\n')
+
 print('\n------------------------')
 print(str(end-start) + ' seconds elapsed\n')
