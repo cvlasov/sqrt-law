@@ -10,6 +10,7 @@ The original PGM files are assumed to be grayscale images.
 import argparse
 import os
 import subprocess
+import sys
 import time
 
 parser = argparse.ArgumentParser()
@@ -101,7 +102,7 @@ if not os.path.isdir(args.input_dir):
 
 # Create output directory if it doesn't exist
 if not os.path.isdir(args.output_dir):
-  os.mkdir(args.output_dir)
+  os.makedirs(args.output_dir)
 
 # Process each image listed in the metadata file
 for line in args.metadata.readlines():
