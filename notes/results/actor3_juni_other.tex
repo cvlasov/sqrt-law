@@ -1,0 +1,57 @@
+Since none of the MinPE values with $\alpha = 0.1$ were quite low enough, I ran the embedding again on a subset of the sizes with some other values of $\alpha$.
+
+\subsection{Embedding}
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & - & - & 04/01/19 \\
+  1056 & 792 & 0.4 & 31621.6 & 8h47m & 14/12/18 \\
+  320 & 240 & 0.3 & 3316.72 & 55m & 14/12/18 \\
+  320 & 240 & 0.4 & 3307.1 & 55m & 14/12/18 \\
+  320 & 240 & 0.5 & 3305.58 & 55m & 14/12/18 \\
+  320 & 240 & 0.6 & - & - & 03/01/19 \\
+  \end{tabular}
+  \end{center}
+
+\subsection{Features}
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 7923.50714922 & 2h12m & 04/01/19 \\
+  1056 & 792 & 0.4 & 3425.78458905.6 & 57m & 14/12/18 \\
+  320 & 240 & 0.3 & 1459.43398404 & 24m & 14/12/18 \\
+  320 & 240 & 0.4 & 1461.83910203 & 24m & 14/12/18 \\
+  320 & 240 & 0.5 & 1459.43398404 & 24m & 14/12/18 \\
+  320 & 240 & 0.6 & 2298.33446884 & 24m & 04/01/19 \\
+  \end{tabular}
+  \end{center}
+
+\subsection{Feature Matrix}
+\begin{itemize}
+  \item Combine feature files:
+  \begin{center}
+  \begin{tabular}{ c c | c | c c c }
+  Width & Height & $\alpha$ & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 55.0291929245 & 55s & 08/01/19 \\
+  1056 & 792 & 0.4 & 49.0757801533 & 49s & 14/12/18 \\
+  320 & 240 & 0.3 & 266.531414986 & 4m & 14/12/18 \\
+  320 & 240 & 0.4 & 295.562961817 & 4m & 14/12/18 \\
+  320 & 240 & 0.5 & 289.210170031 & 4m & 14/12/18 \\
+  320 & 240 & 0.6 & 113.729305029 & 1m & 04/01/19 \\
+  \end{tabular}
+  \end{center}
+
+  \item Convert to MATLAB matrix (no timing information)
+\end{itemize}
+
+\subsection{Linear Classifier}
+  \begin{center}
+  \begin{tabular}{ c c | c | c | c c c }
+  Width & Height & $\alpha$ & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  1056 & 792 & 0.3 & 0.2249 & 926.3549 & 15m & 08/01/19 \\
+  1056 & 792 & 0.4 & 0.1297 & 572.7521 & 9m & 15/12/18 \\
+  320 & 240 & 0.3 & 0.3997 & 1075.703 & 17m & 15/12/18 \\
+  320 & 240 & 0.4 & 0.3500 & 1047.573 & 17m & 15/12/18 \\
+  320 & 240 & 0.5 & 0.2791 & 1127.515 & 18m & 15/12/18 \\
+  \end{tabular}
+  \end{center}

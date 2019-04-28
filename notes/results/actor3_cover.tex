@@ -1,0 +1,77 @@
+\subsection{Pre-Processing}
+\begin{itemize}
+    \item 01/11/18: $655.185225964s \approx$ 10m55s
+\end{itemize}
+
+\subsection{Cropping}
+\begin{itemize}
+  \item 01/11/18:
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  W & H & Seconds & Approx. Time\\ \hline
+  2912 & 2184 & 689.414359808 & 11m29s \\
+  2720 & 2040 & 662.552460909 & 11m02s \\
+  2528 & 1896 & 662.54279089 & 11m02s \\
+  2304 & 1728 & 632.872202158 & 10m32s \\
+  2048 & 1536 & 605.926501989 & 10m05s \\
+  1792 & 1344 & 555.097690105 & 9m15s \\
+  1472 & 1104 & 511.460752964 & 8m31s \\
+  1056 & 792 & 438.49830699 & 7m18s \\
+  320 & 240 & 359.436480045 & 5m59s \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Costs}
+\begin{itemize}
+  \item 17/11/18:
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & 202775.362686 & 2d 8h 19m \\
+  2912 & 2184 & 194673.499774 & 2d 6h 4m \\
+  2720 & 2040 & 183598.260891 & 2d 2h 59m \\
+  2528 & 1896 & 172031.831308 & 1d 23h 47m \\
+  2304 & 1728 & 152188.728338 & 1d 18h 16m \\
+  2048 & 1536 & 129785.996801 & 1d 12h 3m \\
+  1792 & 1344 & 104988.846009 & 1d 5h 9m \\
+  1472 & 1104 & 74601.1954741 & 10h 43m \\
+  1056 & 792 & 39340.753726 & 10h 55m \\
+  320 & 240 & 3767.95246005 & 1h 2m \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Features}
+\begin{itemize}
+\item 10/11/18:
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Seconds & Approx. Time \\ \hline
+  3072 & 2304 & 72,282.4331231 & 20h4m \\
+  2912 & 2184 & 63,869.6948001 & 17h44m \\
+  2720 & 2040 & 54,000.526902 & 15h0m \\
+  2528 & 1896 & 40,194.252851 & 11h9m \\
+  2304 & 1728 & 32,157.8610289 & 8h55m \\
+  2048 & 1536 & 30,295.748122 & 8h24m \\
+  1792 & 1344 & 18,653.2866731 & 5h10m \\
+  1472 & 1104 & 14,390.2565191 & 3h59m \\
+  1056 & 792 & 8,721.86998391 & 2h25m \\
+  320 & 240 & 6,430.11 & 1h22m \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item On 15/11/18, I checked the sums of the features to ensure that they all add up to the same constant. This constant turns out to be 1346 for each image's features, regardless of size.
+  \item However, it turns out that several hundred images' features were not computed.
+  \end{itemize}
+\item 17/11/18: Unfortunately the timing information wasn't logged, but as a general idea, all processes finished after around 18-20 hours.
+\end{itemize}
+
+\subsection{Feature Matrix}
+\begin{itemize}
+\item 02/12/18:
+  \begin{itemize}
+  \item Combine feature files: \textit{Timing information lost}
+  \item Convert to MATLAB matrix (no timing information)
+  \end{itemize}
+\end{itemize}
