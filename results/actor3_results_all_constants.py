@@ -74,4 +74,4 @@ plt.legend()
 
 # Save plot
 plt.tight_layout()
-plt.savefig('graph_29_03_2019.png')
+plt.savefig('actor3_full_graph_29_03_2019.png')
