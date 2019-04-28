@@ -7,6 +7,7 @@
 
 \graphicspath{{images/}}
 
+\newcommand{\Jbin}{\texorpdfstring{$J_{bin}$}{J(bin)}}
 \newcommand{\Jtern}{\texorpdfstring{$J_{0.1}$}{J(0.1)}}
 \newcommand{\y}{\checkmark}
 
@@ -23,7 +24,7 @@
 %-----------------------
 \chapter{Task Documentation}
 
-All timings mentioned here are approximate. The specific results can be found in Section \ref{sec:script-timings}.
+All timings mentioned here are approximate. The specific results can be found in Chapter \ref{sec:actor3-results}.
 
 \section{Image Curation}
 
@@ -77,20 +78,184 @@ Width & Height & Total pixels \\ \hline
 I wrote a script called \texttt{crop.py} to crop the original cover photos to the sizes computed in Section \ref{subsec:image-sizes}. It takes the desired height and width as well as source and destination directories as commandline arguments. Then it computes where the cropping should start so that $8 \times 8$ blocks are cropped evenly from the top/bottom and left/right and then runs \texttt{jpegtran} to do the cropping on all the images in the given source directory. It took around 6 minutes to crop to the smallest size ($320 \times 240$) and 11 and a half minutes to crop to the second-largest size ($2720 \times 2040$).
 
 
-\subsection{Costs}
-\label{subsec:costs}
-
-TO DO
-
-
-\subsection{Features}
-\label{subsec:features}
-
-TO DO
-
-
 %-----------------------
 \chapter{Meeting Notes}
+
+\section{Easter Break}
+
+\begin{itemize}
+
+  \item Complete results (from 29/03/19) with larger/smaller constants:
+    \begin{center}
+      \includegraphics[width=\linewidth]{graph_29_03_2019.png}
+    \end{center}
+
+\end{itemize}
+
+\section{08/03/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Computed two new sets of constants:
+      \begin{center}
+        \begin{tabular}{ c | c c c }
+        & $-30\%$ & Original & $+30\%$ \\ \hline
+        r1 & 49176.55272727272 & 70252.21818181817 & 91327.88363636362 \\
+        r2 & 27.726656205965558 & 39.609508865665084 & 51.492361525364615 \\
+        r3 & 1.2845357597929208 & 1.8350510854184585 & 2.385566411043996 \\
+        r4 & 0.01563280510179924 & 0.022332578716856056 & 0.029032352331912873 \\
+        \end{tabular}
+      \end{center}
+      
+      \item Computed new payload sizes for the smaller constants:
+      \begin{center}
+        \begin{tabular}{ c c c | c c c c }
+        Width & Height & Pixels & $O(1)$ & $O(\sqrt{n})$ & $O(\sqrt{n} \cdot \log n)$ & $O(n)$ \\ \hline
+        3072 & 2304 & 7077888 & 49176 & 73764 & 77762 & 110647 \\
+        2912 & 2184 & 6359808 & 49176 & 69922 & 73212 & 99421 \\
+        2720 & 2040 & 5548800 & 49176 & 65312 & 67790 & 86743 \\
+        2528 & 1896 & 4793088 & 49176 & 60702 & 62410 & 74929 \\
+        2304 & 1728 & 3981312 & 49176 & 55323 & 56194 & 62239 \\
+        2048 & 1536 & 3145728 & 49176 & 49176 & 49176 & 49176 \\
+        1792 & 1344 & 2408448 & 49176 & 43029 & 42261 & 37650 \\
+        1472 & 1104 & 1625088 & 49176 & 35345 & 33785 & 25404 \\
+        1056 & 792 & 836352 & 49176 & 25356 & 23111 & 13074 \\
+        320 & 240 & 76800 & 49176 & 7683 & 5777 & 1200 \\
+        \end{tabular}
+      \end{center}
+      
+      \item Computed new payload sizes for the larger constants:
+      \begin{center}
+        \begin{tabular}{ c c c | c c c c }
+        Width & Height & Pixels & $O(1)$ & $O(\sqrt{n})$ & $O(\sqrt{n} \cdot \log n)$ & $O(n)$ \\ \hline
+        3072 & 2304 & 7077888 & 91327 & 136991 & 144416 & 205487 \\
+        2912 & 2184 & 6359808 & 91327 & 129856 & 135966 & 184640 \\
+        2720 & 2040 & 5548800 & 91327 & 121294 & 125895 & 161094 \\
+        2528 & 1896 & 4793088 & 91327 & 112732 & 115905 & 139154 \\
+        2304 & 1728 & 3981312 & 91327 & 102743 & 104361 & 115586 \\
+        2048 & 1536 & 3145728 & 91327 & 91327 & 91327 & 91327 \\
+        1792 & 1344 & 2408448 & 91327 & 79911 & 78485 & 69922 \\
+        1472 & 1104 & 1625088 & 91327 & 65641 & 62744 & 47180 \\
+        1056 & 792 & 836352 & 91327 & 47090 & 42921 & 24281 \\
+        320 & 240 & 76800 & N/A & 14269 & 10728 & 2229 \\
+        \end{tabular}
+      \end{center}
+
+      \item Results (so far) of experiments using smaller and larger constants:
+        \begin{center}
+          \includegraphics[width=\linewidth]{graph_07_03_2019.png}
+        \end{center}
+
+    \end{itemize}
+
+  \item My next set of experiments will be on BOSSbase.
+
+\end{itemize}
+
+
+\section{01/03/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Finished all experiments and put together the results graph:
+        \begin{center}
+          \includegraphics[width=\linewidth]{combined_graph_27_02_2019.png}
+        \end{center}
+      \item Miscellaneous:
+        \begin{itemize}
+          \item I parallelised the feature computation just like with embedding by looking at the last digit of the image numbers to spin up ten concurrent processes. Before, the feature files were being computed sequentially, which took 5-10 hours (depending on the image size). Now it takes less than 30 minutes.
+          \item I tried using \texttt{at} for task scheduling, but realised that it means that I lose the timing information. This is because \texttt{at} either swallows the standard output/error or emails it to you, given the appropriate command line argument. But, there doesn't seem to be an appropriate email program installed and I don't know if it's worth it to use.
+          \item A lot of timing information for the binary embedding was lost because somehow I (or my script) didn't specify/incorrectly specified a file for redirecting the standard output when running commands with \texttt{nohup}. It was all instead written to the default \texttt{nohup.out} file, which is now a big mess because many processes were writing to it concurrently. I made a note of all the tasks for which I have not timing information in my results tables at the end of this document.
+          \item I made a copy of all the features into \texttt{/home} as a backup.
+          \item I didn't end up applying to the BCS conference because of personal matters I had to deal with last week (deadline was Friday 22nd February) and because of uncertainty with what I was going to do over the break.
+          \item I just booked my flights back to Canada and I am gone from 12th March to 4th April.
+          \item I started adding papers to my bibliography. What format do I use? Which pieces of information are necessary (e.g. location, specific date as opposed to year)?
+        \end{itemize}
+      \item Next: do the same set of experiments but with two different constants - which ones?
+    \end{itemize}
+
+\item Now redo the experiment with two new sets of constants. These can be +/- 30\% of the existing ones. Should result in graphs with very similar shapes, just shifted slightly upwards and downwards, respectively.
+
+\item I should also try training the classifier on all image sizes (e.g. a tenth of the images of each size) and then finding its error rate on images of each size.
+
+\item It would be good to run these experiments on another images set. Dr. Ker will dig up the BOSSBase images and I can use these next.
+
+\end{itemize}
+
+\section{15/02/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Reran \texttt{calculate\_payload\_sizes.py} to get the right $O(\sqrt{n}\cdot\log{n})$ payload sizes (now $2048\times1536$ has the same payload size in all cases):
+      \begin{center}
+        \begin{tabular}{ c c c | c c c c }
+        Width & Height & Pixels & $O(1)$ & $O(\sqrt{n})$ & $O(\sqrt{n} \cdot \log n)$ & $O(n)$ \\ \hline
+        3072 & 2304 & 7077888 & 70252 & 105378 & 111089 & 158067 \\
+        2912 & 2184 & 6359808 & 70252 & 99889 & 104589 & 142030 \\
+        2720 & 2040 & 5548800 & 70252 & 93303 & 96843 & 123919 \\
+        2528 & 1896 & 4793088 & 70252 & 86717 & 89158 & 107042 \\
+        2304 & 1728 & 3981312 & 70252 & 79033 & 80278 & 88912 \\
+        2048 & 1536 & 3145728 & 70252 & 70252 & 70252 & 70252 \\
+        1792 & 1344 & 2408448 & 70252 & 61470 & 60373 & 53786 \\
+        1472 & 1104 & 1625088 & 70252 & 50493 & 48264 & 36292 \\
+        1056 & 792 & 836352 & 70252 & 36223 & 33016 & 18677 \\
+        320 & 240 & 76800 & 70252 & 10976 & 8253 & 1715 \\
+        \end{tabular}
+      \end{center}
+    \end{itemize}
+
+\end{itemize}
+
+\section{08/02/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Fixed problems with the binary embedding code.
+        \begin{itemize}
+          \item There was a problem with the exponential search for lambda getting stuck in an infinite loop. Then, I figured out that the floating point precision in the binary search for $\lambda$ was insufficient for finding a value of $\lambda$ such that the entropy sum is in the range $b \leq \lambda < b+1$, where $b$ is the number of payload bits. For $b = 70252$, it turned out that the entropy sum reached $70,253$ but could no longer be refined because the upper and lower bounds for $\lambda$ had reached the limits of the floating point precision.
+        \end{itemize}
+      \item Ran binary embedding on all image sizes for the $O(\sqrt{n})$ payloads (and all payload sizes for the $320\times240$ images)
+        \begin{itemize}
+          \item There were hangups in the middle of the embedding processes, so I killed all processes.
+        \end{itemize}
+      \item Noticed that the payload sizes computed for $O(\sqrt{n}\cdot\log{n})$ are wrong because the number of bits for the middle size is different from the the number of bits for the same size but other proportions. Probably a bug in the code.
+    \end{itemize}
+
+  \item The MinPE values for the processes that finished (only the ones for $320\times240$ images) look correct.
+  
+  \item There was indeed a bug in my \texttt{calculate\_payload\_sizes.py} script - I forgot to replace one of the calls to \texttt{log(x)} with \texttt{log(x,2)}, to use the right logarithm base.
+
+\end{itemize}
+
+\section{25/01/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Finished the graph template for the experiment results:
+        \begin{center}
+          \includegraphics[width=0.7\linewidth]{graph_template.png}
+        \end{center}
+        \begin{itemize}
+          \item If we decide to use only one proportionality constant for each payload size, then we will only have one plot per figure (rather than three like in the 2008 paper).
+        \end{itemize}
+    
+      \item Finished writing the binary embedding code.
+        \begin{itemize}
+          \item Not quite working. Either throws an unknown error or behaves as if there are no images to process.
+        \end{itemize}
+    \end{itemize}
+
+\end{itemize}
 
 \section{11/01/19}
 
@@ -98,7 +263,7 @@ TO DO
 
   \item What I did:
     \begin{itemize}
-      \item Finished running J-UNIWARD on...
+      \item Finished running J-UNIWARD on all remaining images sizes.
       \item Picked values for $r_1, r_2, r_3, r_4$.
         \begin{itemize}
           \item The image size and $\alpha$ combination that produced a MinPE value closest to 20\% was $1056\times792$ with $\alpha=0.3$ (MinPE = 22\%).
@@ -112,6 +277,7 @@ TO DO
               \item $r_2 = 39.609508865665084$
               \item $r_3 = 2.64741910071112$
               \item $r_4 = 0.022332578716856056$
+              \item For some reason, these values (and the values in the table below) differ when run on my computer versus on the server.
             \end{itemize}
           \item Using these constants, compute the number of bits to embed for each image size:
           \begin{center}
@@ -131,6 +297,18 @@ TO DO
           \end{center}
         \end{itemize}
     \end{itemize}
+
+\item Later we can try training the classifier on all image sizes (maybe 10\% of the images of each size) and then run it against the images of each size. It can also be run against a set of images of multiple sizes.
+
+\item Once we have the results, we can also try running all the experiments again on another set of images (from another actor).
+  \begin{itemize}
+    \item Actor 27 has 4890 images shot on an iPhone, but they are very small ($320 \times 480$).
+    \item Actor 245 has 1524 images shot on an iPhone, of various different sizes.
+    \item Actor 17 has a Sony camera with a good number of images and a nice camera.
+    \item We could also use the original BossBase images (as opposed to the ones that have been shrunken down to $512 \times 512$). But a bit overused and artificial since they come from lots of different cameras.
+  \end{itemize}
+
+\item YFCC100m dataset
 
 \end{itemize}
 
@@ -466,7 +644,7 @@ TO DO
   \begin{itemize}
   \item This is a possible project extension.
 
-  \item The tricky part is computing the probabilities since the optimal solution is no longer $\pi_i = \frac{1}{1+e^{\lambda c_i}}$. Instead, it's $\frac{\pi_i}{H2'(\pi_i)} = \lambda c_i$.
+  \item The tricky part is computing the probabilities since the optimal solution is no longer $\pi_i = \frac{1}{1+e^{\lambda c_i}}$. Instead, it's $\frac{\pi_i}{H_{2}'(\pi_i)} = \lambda c_i$.
 
   \item The probabilities can be computed by running Newton-Raphson several times (Dr. Ker did it 8 times)
 
@@ -716,42 +894,29 @@ TO DO
 \end{itemize}
 
 
-\section{Task Tracking}
+\section{Lessons Learned}
+\label{sec:lessons-learned}
 
-\begin{center}
-\begin{tabular}{ c c | c | c | c | c | c | c | c | c | c | c | c }
-W    & H    & 1  & 2  & 3  & 4  & 5  & 6  & 7  & 8  & 9  & 10 & 11 \\ \hline
-3072 & 2304 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
-2912 & 2184 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
-2720 & 2040 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
-2528 & 1896 & \y & \y & \y & -  & -  & -  & -  &    &    &    &    \\
-2304 & 1728 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-2048 & 1536 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-1792 & 1344 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-1472 & 1104 & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-1056 & 792  & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-320  & 240  & \y & \y & \y & \y & \y & \y & \y &    &    &    &    \\
-\end{tabular}
-\end{center}
-
-Legend:
 \begin{itemize}
-  \item 1 = costs
-  \item 2 = cover features
-  \item 3 = cover feature matrix
-  \item 4 = J-UNIWARD with $\alpha = 0.1$ (called $J_{0.1}$ from now on)
-  \item 5 = $J_{0.1}$ features
-  \item 6 = $J_{0.1}$ feature matrix
-  \item 7 = linear classifier run on cover and $J_{0.1}$
-  \item 8 = binary J-UNIWARD (called $J_{bin}$ from now on)
-  \item 9 = $J_{bin}$ features
-  \item 10 = $J_{bin}$ feature matrix
-  \item 11 = linear classifier run on cover and $J_{bin}$
+
+\item The input and output file to \texttt{jpegtran} can't be the same, otherwise you get an ``\texttt{Empty input file}'' error.
+
+\item If it looks like directories on the server have disappeared, turn off f.lux or change the colour settings in \texttt{.bashrc}.
+
+\item Beware that in Python versions earlier than 2.3, the \texttt{log} function computes the natural logarithm. In version 2.3, an optional \texttt{base} argument was added in order to specify the base of the logarithm. So, if you execute \texttt{log(64,2)} with a Python version earlier than 2.3, the second argument is ignored and you get the natural logarithm of 64.
+
+\item If I use \texttt{at} to schedule tasks, I will not have access to the standard output because it tries to email it to me, which fails because there is no mail transfer agent installed.
+
+\item Back up features (\texttt{.mat} files) to \texttt{/home} because it is backed up whereas \texttt{/array} is not. Nothing happened yet, but just in case. Last backup was 27/02/19.
+
 \end{itemize}
 
 
-\section{Script Timings}
-\label{sec:script-timings}
+%-----------------------
+\chapter{Actor3 Experiment Results}
+\label{sec:actor3-results}
+
+\section{Cover Images}
 
 \subsection{Initial Curation}
 \begin{itemize}
@@ -830,7 +995,7 @@ Legend:
   \end{center}
 \end{itemize}
 
-\subsection{Cover Features}
+\subsection{Features}
 \begin{itemize}
 \item 10/11/18: \texttt{compute\_features.py -I sizeX/cover/}
   \begin{center}
@@ -860,7 +1025,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{Cover Feature Matrix}
+\subsection{Feature Matrix}
 \begin{itemize}
 \item First step (02/12/18): \texttt{combine\_feature\_files.py -I sizeX/cover/} \\
          \texttt{-O features/sizeX\_cover.fea}
@@ -876,7 +1041,9 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{\Jtern Embedding}
+\section{Ternary Embedding (with \texorpdfstring{$\alpha=0.1$}{alpha})}
+
+\subsection{Embedding}
 \begin{itemize}
 \item \texttt{./J-UNIWARD-EMBED-WITH-COSTS -v -I sizeX/cover} \\
          \texttt{-O sizeX/stego-juni-01 -a 0.1}
@@ -898,7 +1065,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{\Jtern Features}
+\subsection{Features}
 \begin{itemize}
 \item \texttt{compute\_features.py -I sizeX/stego-juni-01/}
   \begin{center}
@@ -917,7 +1084,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{\Jtern Feature Matrix}
+\subsection{Feature Matrix}
 \begin{itemize}
 \item First step: \texttt{combine\_feature\_files.py -I sizeX/stego-juni-01/} \\
          \texttt{-O features/sizeX\_juni\_01.fea}
@@ -943,7 +1110,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{Linear Classifier on Cover and \Jtern} \label{j01-classifier}
+\subsection{Linear Classifier} \label{j01-classifier}
 \begin{itemize}
 \item \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\
          \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_0X.mat}
@@ -960,7 +1127,8 @@ Legend:
   \end{center}
 \end{itemize}
 
-\subsection{Other Embedding}
+
+\section{Ternary Embedding (with other \texorpdfstring{$\alpha$}{alpha} values)}
 \begin{itemize}
 \item Since none of the MinPE values in Section \ref{j01-classifier} were quite low enough, I ran the embedding again on a subset of the sizes with some other values of $\alpha$.
 \item \texttt{./J-UNIWARD-EMBED-WITH-COSTS -v -I sizeX/cover} \\
@@ -981,7 +1149,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{Other Features}
+\subsection{Features}
 \begin{itemize}
 \item \texttt{compute\_features.py -I sizeX/stego-juni-0X/}
   \begin{center}
@@ -997,7 +1165,7 @@ Legend:
   \end{center}
 \end{itemize}
 
-\subsection{Other Feature Matrix}
+\subsection{Feature Matrix}
 \begin{itemize}
 \item First step: \texttt{combine\_feature\_files.py -I sizeX/stego-juni-0X/} \\
          \texttt{-O features/sizeX\_juni\_0X.fea}
@@ -1020,7 +1188,7 @@ Legend:
   \end{itemize}
 \end{itemize}
 
-\subsection{Linear Classifier on Cover and Other Embedding}
+\subsection{Linear Classifier}
 \begin{itemize}
 \item \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\
          \texttt{features/sizeX\_cover.mat features/sizeX\_juni\_0X.mat}
@@ -1037,15 +1205,646 @@ Legend:
 \end{itemize}
 
 
-\section{Lessons Learned}
-\label{sec:lessons-learned}
+\newpage
+\section{Binary Embedding}
 
+\subsection{Embedding}
 \begin{itemize}
+\item Command: \\
+  \texttt{./BINARY-EMBED -v -I sizeX/cover -O sizeX/stego-Yb -b Y}
 
-\item The input and output file to \texttt{jpegtran} can't be the same, otherwise you get an ``\texttt{Empty input file}'' error.
+\item Embedding with $O(1)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 49176 & ?? & ?? & 16/03/19 \\ % COMPUTE TIMING
+  3072 & 2304 & 70252 & $>$61000 & $>$16h56m & 17/02/19 \\
+  3072 & 2304 & 91327 & ?? & ?? & 28/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 49176 & ?? & ?? & 27/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 70252 & $>$108000 & $>$1d6h & 17/02/19 \\
+  2912 & 2184 & 91327 & ?? & ?? & 28/03/19 \\ % COMPUTE TIMING
+  2720 & 2040 & 49176 & 127453.5 & 1d11h & 23/03/19 \\
+  2720 & 2040 & 70252 & $>$80000 & $>$22h13m & 17/02/19 \\
+  2720 & 2040 & 91327 & 140831.4 & 1d15h & 22/03/19 \\
+  2528 & 1896 & 49176 & 111813.3 & 1d7h & 20/03/19 \\
+  2528 & 1896 & 70252 & $>$101612 & $>$1d4h & 17/02/19 \\
+  2528 & 1896 & 91327 & 116834.6 & 1d8h & 22/03/19 \\
+  2304 & 1728 & 49176 & 95216.4 & 1d2h & 19/03/19 \\
+  2304 & 1728 & 70252 & $>$98000 & $>$1d3h & 11/02/19 \\
+  2304 & 1728 & 91327 & 99607.8 & 1d3h & 19/03/19 \\
+  2048 & 1536 & 49176 & 81248.75 & 22h34m & 07/03/19 \\
+  2048 & 1536 & 70252 & $>$4514.07 & $>$1h15m & 10/02/19 \\
+  2048 & 1536 & 91327 & 83998.13 & 23h19m & 07/03/19 \\
+  1792 & 1344 & 49176 & 59433.77 & 16h30m & 05/03/19 \\
+  1792 & 1344 & 70252 & 62200 & 17h16m & 11/02/19 \\
+  1792 & 1344 & 91327 & 54603.88 & 15h10m & 15/03/19 \\
+  1472 & 1104 & 49176 & 39487.84 & 10h58m & 05/03/19 \\
+  1472 & 1104 & 70252 & 42994.4 & 11h56m & 04/02/19 \\
+  1472 & 1104 & 91327 & 44439.1 & 12h20m & 05/03/19 \\
+  1056 & 792 & 49176 & 24320.21 & 6h45m & 04/03/19 \\
+  1056 & 792 & 70252 & 20011.3 & 5h33m & 03/02/19 \\
+  1056 & 792 & 91327 & 19933.62 & 5h32m & 04/03/19 \\
+  320 & 240 & 49176 & 2374.767 & 39m & 03/03/19 \\
+  320 & 240 & 70252 & 2700.35 & 45m & 03/02/19 \\
+  320 & 240 & N/A & N/A & N/A & N/A \\
+  \end{tabular}
+  \end{center}
+  
+\newpage
+\item Embedding with $O(\sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 73764 & 225602.2 & 2d14h & 03/03/19 \\
+  3072 & 2304 & 105378 & $>$51000 & $>$14h & 17/02/19 \\
+  3072 & 2304 & 136991 & ?? & ?? & 20/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 69922 & ?? & ?? & 04/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 99889 & -- & -- & 10/02/19 \\ % no timing info
+  2912 & 2184 & 129856 & ?? & ?? & 22/03/19 \\ % COMPUTE TIMING
+  2720 & 2040 & 65312 & 126430.1 & 1d11h & 05/03/19 \\
+  2720 & 2040 & 93303 & -- & -- & 17/02/19 \\ % no timing info
+  2720 & 2040 & 121294 & 149336.1 & 1d17h & 22/03/19 \\
+  2528 & 1896 & 60702 & 118372.8 & 1d8h & 06/03/19 \\
+  2528 & 1896 & 86717 & -- & -- & 10/02/19 \\ % no timing info
+  2528 & 1896 & 112732 & 115862.0 & 1d8h & 16/03/19 \\
+  2304 & 1728 & 55323 & 87654.63 & 1d0h & 07/03/19 \\
+  2304 & 1728 & 79033 & -- & -- & 10/02/19 \\ % no timing info
+  2304 & 1728 & 102743 & 104371 & 1d4h & 15/03/19 \\
+  2048 & 1536 & 49176 & 81248.75 & 22h34m & 07/03/19 \\
+  2048 & 1536 & 70252 & $>$4514.07 & $>$1h15m & 10/02/19 \\
+  2048 & 1536 & 91327 & 83998.13 & 23h19m & 07/03/19 \\
+  1792 & 1344 & 43029 & 62264.96 & 17h17m & 05/03/19 \\
+  1792 & 1344 & 61470 & -- & -- & 10/02/19 \\ % no timing info
+  1792 & 1344 & 79911 & 70561.84 & 22h11m & 06/03/19 \\
+  1472 & 1104 & 35345 & 38142.99 & 10h35m & 03/03/19 \\
+  1472 & 1104 & 50493 & 45099.3 & 12h31m & 04/02/19 \\
+  1472 & 1104 & 65641 & 36643.5 & 10h10m & 06/03/19 \\
+  1056 & 792 & 25356 & 17914.98 & 4h58m & 03/03/19 \\
+  1056 & 792 & 36223 & $>$683.576 & $>$11m & 10/02/19 \\
+  1056 & 792 & 47090 & 18208.44 & 5h3m & 16/03/19 \\
+  320 & 240 & 7683 & 1913.174 & 31m & 02/03/19 \\
+  320 & 240 & 10976 & 1685.92 & 28m & 03/02/19 \\
+  320 & 240 & 14269 & 2034.716 & 33m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
 
-\item If it looks like directories on the server have disappeared, turn off f.lux or change the colour settings in \texttt{.bashrc}.
+\newpage
+\item Embedding with $O(\log{n} \cdot \sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 77762 & ?? & ?? & 03/03/19 \\ % COMPUTE TIMING
+  % hang: 1h40m + 12m = 1h52m
+  % 8:07 - 00:17 = 7h50m
+  % 7h50m - 1h52m = 5h58m (this is the time for 0-4)
+  % TO DO: 5-9
+  3072 & 2304 & 111089 & $>$43000 & $>$11h56m & 17/02/19 \\
+  3072 & 2304 & 144416 & ?? & ?? & 25/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 73212 & ?? & ?? & 05/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 104589 & $>$103355 & $>$1d4h & 23/02/19 \\
+  2912 & 2184 & 135966 & 182316.1 & 2d2h & 26/03/19 \\
+  2720 & 2040 & 67790 & 137358.0 & 1d14h & 06/03/19 \\
+  2720 & 2040 & 96843 & $>$112994 & $>$1d7h & 23/02/19 \\
+  2720 & 2040 & 125895 & 166740.0 & 1d22h & 25/03/19 \\
+  2528 & 1896 & 62410 & ?? & ?? & 06/03/19 \\ % COMPUTE TIMING
+  2528 & 1896 & 89158 & 103358.15 & 1d4h & 24/02/19 \\
+  2528 & 1896 & 115905 & 119591.7 &  & 17/03/19 \\ % TIME
+  2304 & 1728 & 56194 & 82540.6 & 22h55m & 29/03/19 \\
+  2304 & 1728 & 80278 & 89343 & 1d & 24/02/19 \\
+  2304 & 1728 & 104361 & 95074.47 & 1d2h & 15/03/19 \\
+  2048 & 1536 & 49176 & 81248.75 & 22h34m & 07/03/19 \\
+  2048 & 1536 & 70252 & $>$4514.07 & $>$1h15m & 10/02/19 \\
+  2048 & 1536 & 91327 & 83998.13 & 23h19m & 07/03/19 \\
+  1792 & 1344 & 42261 & 62248.53 & 17h17m & 05/03/19 \\
+  1792 & 1344 & 60373 & 59000 & 16h23m & 17/02/19 \\
+  1792 & 1344 & 78485 & 55638.11 & 15h27m & 06/03/19 \\
+  1472 & 1104 & 33785 & 38831.33 & 10h47m & 03/03/19 \\
+  1472 & 1104 & 48264 & 45000 & 12h30m & 17/02/19 \\
+  1472 & 1104 & 62744 & 44507.47 & 12h21m & 05/03/19 \\
+  1056 & 792 & 23111 & 15977.93 & 4h26m & 03/03/19 \\
+  1056 & 792 & 33016 & -- & -- & 16/02/19 \\ % no timing info
+  1056 & 792 & 42921 & 20978.56 & 5h49m & 04/03/19 \\
+  320 & 240 & 5777 & 1825.240 & 30m & 03/03/19 \\
+  320 & 240 & 8253 & $>$635.221 & $>$10m & 10/02/19 \\
+  320 & 240 & 10728 & 1933.976 & 32m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
 
+\newpage
+\item Embedding with $O(n)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 110647 & 172496.9 & 1h23h & 18/03/19 \\
+  3072 & 2304 & 158067 & 216142.3 & 2d12h & 24/02/19 \\
+  3072 & 2304 & 205487 & 160215.2 & 1d20h & 29/03/19 \\
+  2912 & 2184 & 99421 & ?? & ?? & 25/03/19 \\ % COMPUTE TIMING
+  2912 & 2184 & 142030 & -- & 2d5h & 25/02/19 \\
+  2912 & 2184 & 184640 & 144727.7 & 1d16h & 29/03/19 \\
+  2720 & 2040 & 86743 & 143952.2 & 1d15h & 23/03/19 \\
+  2720 & 2040 & 123919 & 141025.7 & 1d15h & 26/02/19 \\
+  2720 & 2040 & 161094 & 157220.7 & 1d19h & 26/03/19 \\
+  2528 & 1896 & 74929 & ?? & ?? & 07/03/19 \\ % COMPUTE TIMING
+  2528 & 1896 & 107042 & 113238.8 & 1d7h & 27/02/19 \\
+  2528 & 1896 & 139154 & ?? & ?? & 18/03/19 \\ % COMPUTE TIMING
+  2304 & 1728 & 62239 & 97526.05 & 1d3h & 16/03/19 \\
+  2304 & 1728 & 88912 & 97086.76 & 1d2h & 26/02/19 \\
+  2304 & 1728 & 115586 & 99207.54 & 1d3h & 17/03/19 \\
+  2048 & 1536 & 49176 & 81248.75 & 22h34m & 07/03/19 \\
+  2048 & 1536 & 70252 & $>$4514.07 & $>$1h15m & 10/02/19 \\
+  2048 & 1536 & 91327 & 83998.13 & 23h19m & 07/03/19 \\
+  1792 & 1344 & 37650 & 63098.06 & 17h31m & 06/03/19 \\
+  1792 & 1344 & 53786 & 55234.16 & 15h20m & 25/02/19 \\
+  1792 & 1344 & 69922 & 66453.09 & 18h27m & 07/03/19 \\
+  1472 & 1104 & 25404 & 34509.6 & 9h35m & 04/03/19 \\
+  1472 & 1104 & 36292 & 38449 & 10h40m & 25/02/19 \\
+  1472 & 1104 & 47180 & 45211.98 & 12h33m & 05/03/19 \\
+  1056 & 792 & 13074 & 21918.58 & 6h5m & 04/03/19 \\
+  1056 & 792 & 18677 & 15100 & 4h11m & 16/02/19 \\
+  1056 & 792 & 24281 & 16819.14 & 4h40m & 04/03/19 \\
+  320 & 240 & 1200 & 1498.869 & 24m & 02/03/19 \\
+  320 & 240 & 1715 & 1382.08 & 23m & 03/02/19 \\
+  320 & 240 & 2229 & 1657.451 & 27m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\newpage
+\subsection{Features}
+\begin{itemize}
+\item Command: \texttt{compute\_features.py -I sizeX/stego-Yb}
+
+\item Features with $O(1)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 49176 & 87468.4551961 & 1d0h & 16/03/19 \\
+  3072 & 2304 & 70252 & 46984.4500248 & 13h3m & 18/02/19 \\
+  3072 & 2304 & 91327 & 28654.6217229 & 7h57m & 28/03/19 \\
+  2912 & 2184 & 49176 & 22817.8052733 & 6h20m & 27/03/19 \\
+  2912 & 2184 & 70252 & 37558.0894871 & 10h25m & 17/02/19 \\
+  2912 & 2184 & 91327 & 26109.3570216 & 7h15m & 28/03/19 \\
+  2720 & 2040 & 49176 & 42703.7677369 & 11h51m & 23/03/19 \\
+  2720 & 2040 & 70252 & 36072.916594 & 10h1m & 17/02/19 \\
+  2720 & 2040 & 91327 & 65526.0531928 & 18h12m & 22/03/19 \\
+  2528 & 1896 & 49176 & 130436.69898 & 1d12h & 20/03/19 \\
+  2528 & 1896 & 70252 & 35909.306066 & 9h58m & 17/02/19 \\
+  2528 & 1896 & 91327 & 24085.4321764 & 6h41m & 22/03/19 \\
+  2304 & 1728 & 49176 & 47811.7135792 & 13h16m & 19/03/19 \\
+  2304 & 1728 & 70252 & 35419.6147239 & 9h50m & 17/02/19 \\
+  2304 & 1728 & 91327 & 54276.669075 & 15h4m & 20/03/19 \\
+  2048 & 1536 & 49176 & 29402.2739372 & 8h10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 33207.936137 & 9h13m & 17/02/19 \\
+  2048 & 1536 & 91327 & 36380.2966471 & 10h6m & 07/03/19 \\
+  1792 & 1344 & 49176 & ?? & ?? & 05/03/19 \\ % no timing info
+  1792 & 1344 & 70252 & 26210.7519009 & 7h16m & 17/02/19 \\
+  1792 & 1344 & 91327 & 10081.4698121 & 2h48m & 16/03/19 \\
+  1472 & 1104 & 49176 & 8794.41904068 & 2h26m & 05/03/19 \\
+  1472 & 1104 & 70252 & 17386.2786419 & 4h49m & 16/02/19 \\
+  1472 & 1104 & 91327 & 16430.9569552 & 4h33m & 05/03/19 \\
+  1056 & 792 & 49176 & 4519.55386352 & 1h15m & 04/03/19 \\
+  1056 & 792 & 70252 & 29033.266953 & 8h3m & 04/02/19 \\
+  1056 & 792 & 91327 & 15869.6408393 & 4h24m & 04/03/19 \\
+  320 & 240 & 49176 & 7610.020973205 & 2h6m & 03/03/19 \\
+  320 & 240 & 70252 & 813.488664865 & 13m & 03/02/19 \\
+  320 & 240 & N/A & N/A & N/A & N/A \\
+  \end{tabular}
+  \end{center}
+  
+\newpage
+\item Features with $O(\sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 73764 & 80922.0440509 & 22h28m & 03/03/19 \\
+  3072 & 2304 & 105378 & 49255.76351 & 13h40m & 17/02/19 \\
+  3072 & 2304 & 136991 & 61661.2307301 & 17h7m & 21/03/19 \\
+  2912 & 2184 & 69922 & 85130.7830179 & 23h38m & 04/03/19 \\
+  2912 & 2184 & 99889 & 42486.8198349 & 11h48m & 17/02/19 \\
+  2912 & 2184 & 129856 & 29296.6336634 & 8h8m & 22/03/19 \\
+  2720 & 2040 & 65312 & 84578.9741294 & 23h29m & 05/03/19 \\
+  2720 & 2040 & 93303 & 36314.8657269 & 10h5m & 17/02/19 \\
+  2720 & 2040 & 121294 & 26779.7132091 & 7h26m & 22/03/19 \\
+  2528 & 1896 & 60702 & 85851.781539 & 23h50m & 06/03/19 \\
+  2528 & 1896 & 86717 & 38099.1221862 & 10h34m & 17/02/19 \\
+  2528 & 1896 & 112732 & 47043.5258255 & 13h4m & 16/03/19 \\
+  2304 & 1728 & 55323 & 25570.4075403 & 7h6m & 07/03/19 \\
+  2304 & 1728 & 79033 & 35428.6774151 & 9h50m & 17/02/19 \\
+  2304 & 1728 & 102743 & 16549.4431532 & 4h35m & 15/03/19 \\
+  2048 & 1536 & 49176 & 29402.2739372 & 8h10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 33207.936137 & 9h13m & 17/02/19 \\
+  2048 & 1536 & 91327 & 36380.2966471 & 10h6m & 07/03/19 \\
+  1792 & 1344 & 43029 & 29298.2088437 & 8h8m & 05/03/19 \\
+  1792 & 1344 & 61470 & 24724.9334159 & 6h52m & 16/02/19 \\
+  1792 & 1344 & 79911 & 20589.7238495 & 5h43m & 06/03/19 \\
+  1472 & 1104 & 35345 & 35528.2139196 & 9h52m & 03/03/19 \\
+  1472 & 1104 & 50493 & 16583.3313291 & 4h36m & 16/02/19 \\
+  1472 & 1104 & 65641 & 27124.7286665 & 7h32m & 06/03/19 \\
+  1056 & 792 & 25356 & 7695.59258175 & 2h8m & 03/03/19 \\
+  1056 & 792 & 36223 & 4043.80457211 & 1h7m & 10/02/19 \\
+  1056 & 792 & 47090 & 10989.9993079 & 3h3m & 16/03/19 \\
+  320 & 240 & 7683 & 13420.048642159 & 3h43m & 03/03/19 \\
+  320 & 240 & 10976 & 8814.44127607 & 2h26m & 03/02/19 \\
+  320 & 240 & 14269 & 9699.32517433 & 2h41m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Features with $O(\log{n} \cdot \sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 77762 & 64165.0254614 & 17h49m & 03/03/19 \\
+  3072 & 2304 & 111089 & 15667.311007 & 9h54m & 18/02/19 \\
+  3072 & 2304 & 144416 & 66243.4391727 & 18h24m & 25/03/19 \\
+  2912 & 2184 & 73212 & 98611.1762438 & 1d3h & 05/03/19 \\
+  2912 & 2184 & 104589 & 19566.717365 & 5h26m & 23/02/19 \\
+  2912 & 2184 & 135966 & 63498.5347029 & 17h38m & 26/03/19 \\
+  2720 & 2040 & 67790 & 81036.1087067 & 22h30m & 06/03/19 \\
+  2720 & 2040 & 96843 & 18377.3187139 & 5h6m & 23/02/19 \\
+  2720 & 2040 & 125895 & 59562.0961859 & 16h32m & 25/03/19 \\
+  2528 & 1896 & 62410 & 32776.2211308 & 9h6m & 06/03/19 \\
+  2528 & 1896 & 89158 & 36394.246537 & 10h6m & 25/02/19 \\
+  2528 & 1896 & 115905 & 46082.104017 & 12h48m & 18/03/19 \\
+  2304 & 1728 & 56194 & 14146.2479212 & 3h55m & 29/03/19 \\
+  2304 & 1728 & 80278 & 26904.6615889 & 7h28m & 24/02/19 \\
+  2304 & 1728 & 104361 & 14877.2953498 & 4h7m & 16/03/19 \\
+  2048 & 1536 & 49176 & 29402.2739372 & 8h10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 33207.936137 & 9h13m & 17/02/19 \\
+  2048 & 1536 & 91327 & 36380.2966471 & 10h6m & 07/03/19 \\
+  1792 & 1344 & 42261 & 30188.3648422 & 8h23m & 05/03/19 \\
+  1792 & 1344 & 60373 & 21166.0959091 & 5h52m & 18/02/19 \\
+  1792 & 1344 & 78485 & 25893.1390047 & 7h11m & 06/03/19 \\
+  1472 & 1104 & 33785 & 14645.4112713 & 4h4m & 03/03/19 \\
+  1472 & 1104 & 48264 & 20401.2422099 & 5h40m & 17/02/19 \\
+  1472 & 1104 & 62744 & 27497.6112786 & 7h38m & 05/03/19 \\
+  1056 & 792 & 23111 & 7018.70651841 & 1h56m & 03/03/19 \\
+  1056 & 792 & 33016 & 7414.97025299 & 2h3m & 16/02/19 \\
+  1056 & 792 & 42921 & 12899.8471687 & 3h34m & 04/03/19 \\
+  320 & 240 & 5777 & 7602.513247014 & 2h6m & 03/03/19 \\
+  320 & 240 & 8253 & 1713.00027585 & 28m & 16/02/19 \\
+  320 & 240 & 10728 & 9776.47659087 & 2h42m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Features with $O(n)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 110647 & 76411.2817299 & 21h13m & 18/03/19 \\
+  3072 & 2304 & 158067 & 40486.1764619 & 11h14m & 27/02/19 \\
+  3072 & 2304 & 205487 & 77217.4703996 & 21h26m & 29/03/19 \\
+  2912 & 2184 & 99421 & 51850.9604163 & 14h24m & 25/03/19 \\
+  2912 & 2184 & 142030 & 26120.325207 & 7h15m & 25/02/19 \\
+  2912 & 2184 & 184640 & 21018.7189531 & 5h50m & 29/03/19 \\
+  2720 & 2040 & 86743 & 36584.3893359 & 10h9m & 23/03/19 \\
+  2720 & 2040 & 123919 & 26204.7609549 & 7h16m & 27/02/19 \\
+  2720 & 2040 & 161094 & 22522.3931799 & 6h15m & 26/03/19 \\
+  2528 & 1896 & 74929 & 91141.6428967 & 1d1h & 15/03/19 \\
+  2528 & 1896 & 107042 & 15718.79787564 & 4h21m & 27/02/19 \\
+  2528 & 1896 & 139154 & 33803.4779005 & 9h23m & 18/03/19 \\
+  2304 & 1728 & 62239 & 22441.9120758 & 6h14m & 17/03/19 \\
+  2304 & 1728 & 88912 & 42948.730552 & 11h55m & 27/02/19 \\
+  2304 & 1728 & 115586 & 14984.3578377 & 4h9m & 17/03/19 \\
+  2048 & 1536 & 49176 & 29402.2739372 & 8h10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 33207.936137 & 9h13m & 17/02/19 \\
+  2048 & 1536 & 91327 & 36380.2966471 & 10h6m & 07/03/19 \\
+  1792 & 1344 & 37650 & 43932.3998611 & 12h12m & 06/03/19 \\
+  1792 & 1344 & 53786 & 15211.650321 & 4h13m & 25/02/19 \\
+  1792 & 1344 & 69922 & 15518.4198549 & 4h18m & 07/03/19 \\
+  1472 & 1104 & 25404 & 29844.1452055 & 8h17m & 04/03/19 \\
+  1472 & 1104 & 36292 & 11716.5168169 & 3h15m & 25/02/19 \\
+  1472 & 1104 & 47180 & 16724.4930618 & 4h38m & 05/03/19 \\
+  1056 & 792 & 13074 & 10193.1102669 & 2h49m & 04/03/19 \\
+  1056 & 792 & 18677 & 13655.626116 & 3h47m & 17/02/19 \\
+  1056 & 792 & 24281 & 15550.941546 & 4h19m & 05/03/19 \\
+  320 & 240 & 1200 & 13085.426150084 & 3h38m & 03/03/19 \\
+  320 & 240 & 1715 & 8862.28981304 & 2h27m & 03/02/19 \\
+  320 & 240 & 2229 & 9861.31005359 & 2h44m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\newpage
+\subsection{Feature Matrix}
+\begin{itemize}
+\item First step: \texttt{combine\_feature\_files.py -I sizeX/stego-Yb/} \\
+         \texttt{-O features/sizeX\_binary\_Yb.fea}
+
+\item Feature matrix with $O(1)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 49176 & 227.739675999 & 3m & 21/03/19 \\
+  3072 & 2304 & 70252 & 252.853466988 & 4m & 26/02/19 \\
+  3072 & 2304 & 91327 & 50.8630750179 & 0m & 28/03/19 \\
+  2912 & 2184 & 49176 & 124.856258154 & 2m & 27/03/19 \\
+  2912 & 2184 & 70252 & 85.6574821472 & 1m & 17/02/19 \\
+  2912 & 2184 & 91327 & 50.9590110779 & 0m & 28/03/19 \\
+  2720 & 2040 & 49176 & 210.355884075 & 3m & 23/03/19 \\
+  2720 & 2040 & 70252 & 38.9857468605 & 0m & 17/02/19 \\
+  2720 & 2040 & 91327 & 79.8529691696 & 1m & 22/03/19 \\
+  2528 & 1896 & 49176 & 38.2506098747 & 0m & 21/03/19 \\
+  2528 & 1896 & 70252 & 129.218651056 & 2m & 17/02/19 \\
+  2528 & 1896 & 91327 & 44.696778059 & 0m & 22/03/19 \\
+  2304 & 1728 & 49176 & 219.060958147 & 3m & 19/03/19 \\
+  2304 & 1728 & 70252 & 358.85760794 & 5m & 17/02/19 \\
+  2304 & 1728 & 91327 & 125.304362059 & 2m & 20/03/19 \\
+  2048 & 1536 & 49176 & 632.630553007 & 10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 862.218221903 & 14m & 17/02/19 \\
+  2048 & 1536 & 91327 & 1228.48091912 & 20m & 07/03/19 \\
+  1792 & 1344 & 49176 & 319.734992981 & 5m & 05/03/19 \\
+  1792 & 1344 & 70252 & 390.150359869 & 6m & 17/02/19 \\
+  1792 & 1344 & 91327 & 96.4794027805 & 1m & 16/03/19 \\
+  1472 & 1104 & 49176 & 43.8332381248 & 0m & 05/03/19 \\
+  1472 & 1104 & 70252 & 1815.72977614 & 30m & 17/02/19 \\
+  1472 & 1104 & 91327 & 103.874501944 & 1m & 05/03/19 \\
+  1056 & 792 & 49176 & 43.5582931042 & 0m & 04/03/19 \\
+  1056 & 792 & 70252 & 133.089641094 & 2m & 10/02/19 \\
+  1056 & 792 & 91327 & 84.5707299709 & 1m & 04/03/19 \\
+  320 & 240 & 49176 & 61.6737239361 & 1m & 03/03/19 \\
+  320 & 240 & 70252 & 334.823001146 & 5m & 03/02/19 \\
+  320 & 240 & N/A & N/A & N/A & N/A \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Feature matrix with $O(\sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 73764 & 263.632461071 & 4m & 03/03/19 \\
+  3072 & 2304 & 105378 & 119.561875105 & 1m & 17/02/19 \\
+  3072 & 2304 & 136991 & 137.048567057 & 2m & 21/03/19 \\
+  2912 & 2184 & 69922 & 174.518545866 & 2m & 04/03/19 \\
+  2912 & 2184 & 99889 & 795.025964022 & 13m & 17/02/19 \\
+  2912 & 2184 & 129856 & 41.4731681347 & 0m & 22/03/19 \\
+  2720 & 2040 & 65312 & 324.896591902 & 5m & 05/03/19 \\
+  2720 & 2040 & 93303 & 107.072767019 & 1m & 17/02/19 \\
+  2720 & 2040 & 121294 & 62.4946548939 & 1m & 22/03/19 \\
+  2528 & 1896 & 60702 & 256.547324896 & 4m & 06/03/19 \\
+  2528 & 1896 & 86717 & 873.271565914 & 14m & 17/02/19 \\
+  2528 & 1896 & 112732 & 173.554177999 & 2m & 17/03/19 \\
+  2304 & 1728 & 55323 & 229.104845047 & 3m & 07/03/19 \\
+  2304 & 1728 & 79033 & 915.09699297 & 15m & 17/02/19 \\
+  2304 & 1728 & 102743 & 39.430989027 & 0m & 15/03/19 \\
+  2048 & 1536 & 49176 & 632.630553007 & 10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 862.218221903 & 14m & 17/02/19 \\
+  2048 & 1536 & 91327 & 1228.48091912 & 20m & 07/03/19 \\
+  1792 & 1344 & 43029 & 65.4516999722 & 1m & 05/03/19 \\
+  1792 & 1344 & 61470 & 1777.79198408 & 29m & 17/02/19 \\
+  1792 & 1344 & 79911 & 47.968957901 & 0m & 06/03/19 \\
+  1472 & 1104 & 35345 & 83.1389400959 & 1m & 03/03/19 \\
+  1472 & 1104 & 50493 & 1709.26175904 & 28m & 16/02/19 \\
+  1472 & 1104 & 65641 & 200.148355961 & 3m & 06/03/19 \\
+  1056 & 792 & 25356 & 195.849433184 & 3m & 03/03/19 \\
+  1056 & 792 & 36223 & 39.5040259361 & 0m & 10/02/19 \\
+  1056 & 792 & 47090 & 45.6129751205 & 0m & 16/03/19 \\
+  320 & 240 & 7683 & 172.7494128974 & 2m & 03/03/19 \\
+  320 & 240 & 10976 & 690.326555967 & 11m & 04/02/19 \\
+  320 & 240 & 14269 & 76.2257049084 & 1m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Feature matrix with $O(\log{n} \cdot \sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 77762 & 343.621596098 & 5m & 04/03/19 \\
+  3072 & 2304 & 111089 & 113.954504967 & 1m & 19/02/19 \\
+  3072 & 2304 & 144416 & 140.097576857 & 2m & 25/03/19 \\
+  2912 & 2184 & 73212 & 363.530250072 & 6m & 05/03/19 \\
+  2912 & 2184 & 104589 & 36.0493149757 & 0m & 24/02/19 \\
+  2912 & 2184 & 135966 & 157.2450881 & 2m & 26/03/19 \\
+  2720 & 2040 & 67790 & 172.096813917 & 2m & 06/03/19 \\
+  2720 & 2040 & 96843 & 48.0687019825 & 0m & 24/02/19 \\
+  2720 & 2040 & 125895 & 157.019212961 &  & 25/03/19 \\
+  2528 & 1896 & 62410 & 47.2514410019 & 0m & 06/03/19 \\
+  2528 & 1896 & 89158 & 106.045143843 & 1m & 25/02/19 \\
+  2528 & 1896 & 115905 & 184.936322927 & 3m & 18/03/19 \\
+  2304 & 1728 & 56194 & 46.648168087 & 0m & 29/03/19 \\
+  2304 & 1728 & 80278 & 106.953674006 & 1m & 25/02/19 \\
+  2304 & 1728 & 104361 & 110.258715868 & 1m & 16/03/19 \\
+  2048 & 1536 & 49176 & 632.630553007 & 10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 862.218221903 & 14m & 17/02/19 \\
+  2048 & 1536 & 91327 & 1228.48091912 & 20m & 07/03/19 \\
+  1792 & 1344 & 42261 & 68.2365150452 & 1m & 05/03/19 \\
+  1792 & 1344 & 60373 & 107.047373056 & 1m & 19/02/19 \\
+  1792 & 1344 & 78485 & 48.856415987 & 0m & 06/03/19 \\
+  1472 & 1104 & 33785 & 194.523323059 & 3m & 04/03/19 \\
+  1472 & 1104 & 48264 & 970.601518869 & 16m & 17/02/19 \\
+  1472 & 1104 & 62744 & 77.1061918736 & 1m & 05/03/19 \\
+  1056 & 792 & 23111 & 176.880733013 & 2m & 03/03/19 \\
+  1056 & 792 & 33016 & 39.8880968094 & 0m & 16/02/19 \\
+  1056 & 792 & 42921 & 60.8147819042 & 1m & 04/03/19 \\
+  320 & 240 & 5777 & 47.0853788853 & 0m & 03/03/19 \\
+  320 & 240 & 8253 & 43.9101500511 & 0m & 16/02/19 \\
+  320 & 240 & 10728 & 62.5113809109 & 1m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Feature matrix with $O(n)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c c c }
+  Width & Height & Bits & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 110647 & 126.241893053 & 2m & 18/03/19 \\
+  3072 & 2304 & 158067 & 73.3681468964 & 1m & 27/02/19 \\
+  3072 & 2304 & 205487 & 46.2296299934 & 0m & 29/03/19 \\
+  2912 & 2184 & 99421 & 70.4530329704 & 1m & 25/03/19 \\
+  2912 & 2184 & 142030 & 60.8014481068 & 1m & 26/02/19 \\
+  2912 & 2184 & 184640 & 41.1151740551 & 0m & 29/03/19 \\
+  2720 & 2040 & 86743 & 46.7586479187 & 0m & 23/03/19 \\
+  2720 & 2040 & 123919 & 50.7779140472 & 0m & 27/02/19 \\
+  2720 & 2040 & 161094 & 38.9449191093 & 0m & 26/03/19 \\
+  2528 & 1896 & 74929 & 197.348838806 & 3m & 15/03/19 \\
+  2528 & 1896 & 107042 & 38.95647192 & 0m & 27/02/19 \\
+  2528 & 1896 & 139154 & 44.4193429947 & 0m & 18/03/19 \\
+  2304 & 1728 & 62239 & 51.8338558674 & 0m & 17/03/19 \\
+  2304 & 1728 & 88912 & 97.6287519932 & 1m & 27/02/19 \\
+  2304 & 1728 & 115586 & 39.4433550835 & 0m & 17/03/19 \\
+  2048 & 1536 & 49176 & 632.630553007 & 10m & 07/03/19 \\
+  2048 & 1536 & 70252 & 862.218221903 & 14m & 17/02/19 \\
+  2048 & 1536 & 91327 & 1228.48091912 & 20m & 07/03/19 \\
+  1792 & 1344 & 37650 & 301.110005856 & 5m & 06/03/19 \\
+  1792 & 1344 & 53786 & 91.612528801 & 1m & 26/02/19 \\
+  1792 & 1344 & 69922 & 1041.00203395 & 17m & 07/03/19 \\
+  1472 & 1104 & 25404 & 84.4692189693 & 1m & 04/03/19 \\
+  1472 & 1104 & 36292 & 48.666615963 & 0m & 25/02/19 \\
+  1472 & 1104 & 47180 & 102.075462818 & 1m & 05/03/19 \\
+  1056 & 792 & 13074 & 40.3709020615 & 0m & 04/03/19 \\
+  1056 & 792 & 18677 & 296.103348017 & 4m & 17/02/19 \\
+  1056 & 792 & 24281 & 287.475348949 & 4m & 05/03/19 \\
+  320 & 240 & 1200 & 179.388769865 & 2m & 03/03/19 \\
+  320 & 240 & 1715 & 679.769860029 & 11m & 04/02/19 \\
+  320 & 240 & 2229 & 83.3646969795 & 1m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\item Second step: \texttt{./run\_txt\_to\_mat.sh /usr/local/matlab-r2014a/} \\
+         \texttt{features/sizeX\_binary\_Yb.fea features/sizeX\_binary\_Yb.mat}
+  \begin{itemize}
+  \item My \texttt{txt\_to\_mat.m} script doesn't produce timing information.
+  \end{itemize}
+\end{itemize}
+
+\newpage
+\subsection{Linear Classifier}
+\begin{itemize}
+\item Command: \texttt{./run\_juniward\_test.sh /usr/local/matlab-r2014a/} \\ \texttt{features/sizeX\_cover.mat features/sizeX\_binary\_Yb.mat}
+
+\item Classifier with $O(1)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c | c c c }
+  Width & Height & Bits & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 49176 & 0.3828 & 494.0306 & 8m & 21/03/19 \\
+  3072 & 2304 & 70252 & 0.3099 & 467.0451 & 7m & 26/02/19 \\
+  3072 & 2304 & 91327 & 0.2444 & 481.8472 & 8m & 28/03/19 \\
+  2912 & 2184 & 49176 & 0.3674 & 367.6847 & 6m & 27/03/19 \\
+  2912 & 2184 & 70252 & 0.2907 & 450.8920 & 7m & 17/02/19 \\
+  2912 & 2184 & 91327 & 0.2254 & 418.1252 & 6m & 28/03/19 \\
+  2720 & 2040 & 49176 & 0.3538 & 789.3004 & 13m & 23/03/19 \\
+  2720 & 2040 & 70252 & 0.2767 & 444.2428 & 7m & 24/02/19 \\
+  2720 & 2040 & 91327 & 0.2101 & 394.3428 & 6m & 22/03/19 \\
+  2528 & 1896 & 49176 & 0.3404 & 336.0806 & 5m & 21/03/19 \\
+  2528 & 1896 & 70252 & 0.2625 & 539.5125 & 8m & 17/02/19 \\
+  2528 & 1896 & 91327 & 0.1962 & 597.7640 & 9m & 22/03/19 \\
+  2304 & 1728 & 49176 & 0.3227 & 577.1155 & 9m & 19/03/19 \\
+  2304 & 1728 & 70252 & 0.2352 & 581.6505 & 9m & 17/02/19 \\
+  2304 & 1728 & 91327 & 0.1664 & 358.1756 & 5m & 21/03/19 \\
+  2048 & 1536 & 49176 & 0.2928 & 707.3133 & 11m & 07/03/19 \\
+  2048 & 1536 & 70252 & 0.2023 & 576.9724 & 9m & 17/02/19 \\
+  2048 & 1536 & 91327 & 0.1344 & 401.3182 & 6m & 07/03/19 \\
+  1792 & 1344 & 49176 & 0.2497 & 534.6837 & 8m & 05/03/19 \\
+  1792 & 1344 & 70252 & 0.1638 & 618.8019 & 10m & 17/02/19 \\
+  1792 & 1344 & 91327 & 0.1033 & 606.1833 & 10m & 16/03/19 \\
+  1472 & 1104 & 49176 & 0.1909 & 647.5711 & 10m & 05/03/19 \\
+  1472 & 1104 & 70252 & 0.1064 & 587.9707 & 9m & 17/02/19 \\
+  1472 & 1104 & 91327 & 0.0596 & 631.3724 & 6m & 05/03/19 \\
+  1056 & 792 & 49176 & 0.0991 & 479.6345 & 7m & 04/03/19 \\
+  1056 & 792 & 70252 & 0.0457 & 402.9970 & 6m & 10/02/19 \\
+  1056 & 792 & 91327 & 0.0217 & 571.5584 & 9m & 04/03/19 \\
+  320 & 240 & 49176 & 0.0000 & 697.3579 & 11m & 03/03/19 \\
+  320 & 240 & 70252 & 0.0000 & 560.1663 & 9m & 06/02/19 \\
+  320 & 240 & N/A & N/A & N/A & N/A & N/A \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Classifier with $O(\sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c | c c c }
+  Width & Height & Bits & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 73764 & 0.2985 & 319.5296 & 5m & 03/03/19 \\
+  3072 & 2304 & 105378 & 0.2081 & 414.6347 & 6m & 17/02/19 \\
+  3072 & 2304 & 136991 & 0.1475 & 587.3197 & 9m & 21/03/19 \\
+  2912 & 2184 & 69922 & 0.2921 & 360.9533 & 6m & 04/03/19 \\
+  2912 & 2184 & 99889 & 0.2054 & 439.0349 & 7m & 17/02/19 \\
+  2912 & 2184 & 129856 & 0.1448 & 574.7981 & 9m & 22/03/19 \\
+  2720 & 2040 & 65312 & 0.2920 & 574.2693 & 9m & 05/03/19 \\
+  2720 & 2040 & 93303 & 0.2053 & 434.5565 & 7m & 17/02/19 \\
+  2720 & 2040 & 121294 & 0.1427 & 575.7162 & 9m & 22/03/19 \\
+  2528 & 1896 & 60702 & 0.2956 & 563.7625 & 9m & 06/03/19 \\
+  2528 & 1896 & 86717 & 0.2115 & 537.7033 & 8m & 17/02/19 \\
+  2528 & 1896 & 112732 & 0.1395 & 565.7045 & 9m & 17/03/19 \\
+  2304 & 1728 & 55323 & 0.2949 & 719.0057 & 11m & 07/03/19 \\
+  2304 & 1728 & 79033 & 0.2054 & 570.8157 & 9m & 17/02/19 \\
+  2304 & 1728 & 102743 & 0.1394 & 478.8804 & 7m & 16/03/19 \\
+  2048 & 1536 & 49176 & 0.2928 & 707.3133 & 11m & 07/03/19 \\
+  2048 & 1536 & 70252 & 0.2023 & 576.9724 & 9m & 17/02/19 \\
+  2048 & 1536 & 91327 & 0.1344 & 401.3182 & 6m & 07/03/19 \\
+  1792 & 1344 & 43029 & 0.2833 & 646.9333 & 10m & 05/03/19 \\
+  1792 & 1344 & 61470 & 0.1918 & 498.3309 & 8m & 17/02/19 \\
+  1792 & 1344 & 79911 & 0.1343 & 486.5471 & 8m & 06/03/19 \\
+  1472 & 1104 & 35345 & 0.2700 & 548.4453 & 9m & 03/03/19 \\
+  1472 & 1104 & 50493 & 0.1842 & 602.5947 & 10m & 17/02/19 \\
+  1472 & 1104 & 65641 & 0.1205 & 642.3130 & 6m & 06/03/19 \\
+  1056 & 792 & 25356 & 0.2476 & 1101.375 & 18m & 03/03/19 \\
+  1056 & 792 & 36223 & 0.1574 & 423.7316 & 7m & 10/02/19 \\
+  1056 & 792 & 47090 & 0.1053 & 636.2859 & 10m & 16/03/19 \\
+  320 & 240 & 7683 & 0.1428 & 730.9041 & 12m & 03/03/19 \\
+  320 & 240 & 10976 & 0.0674 & 480.4507 & 8m & 10/02/19 \\
+  320 & 240 & 14269 & 0.0320 & 598.0637 & 9m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Classifier with $O(\log{n} \cdot \sqrt{n})$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c | c c c }
+  Width & Height & Bits & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 77762 & 0.2849 & 336.8287 & 5m & 04/03/19 \\
+  3072 & 2304 & 111089 & 0.1950 & 410.6305 & 6m & 23/02/19 \\
+  3072 & 2304 & 144416 & 0.1347 & 471.8878 & 7m & 25/03/19 \\
+  2912 & 2184 & 73212 & 0.2804 & 375.5300 & 6m & 05/03/19 \\
+  2912 & 2184 & 104589 & 0.1965 & 498.7603 & 8m & 24/02/19 \\
+  2912 & 2184 & 135966 & 0.1324 & 437.8727 & 7m & 26/03/19 \\
+  2720 & 2040 & 67790 & 0.2820 & 647.1747 & 6m & 06/03/19 \\
+  2720 & 2040 & 96843 & 0.1962 & 156.7496 & 2m & 24/02/19 \\
+  2720 & 2040 & 125895 & 0.1340 & 628.6887 & 10m & 25/03/19 \\
+  2528 & 1896 & 62410 & 0.2909 & 551.8320 & 9m & 06/03/19 \\
+  2528 & 1896 & 89158 & 0.2030 & 528.4735 & 8m & 25/02/19 \\
+  2528 & 1896 & 115905 & 0.1307 & 600.2269 & 10m & 18/03/19 \\
+  2304 & 1728 & 56194 & 0.2916 & 358.3991 & 5m & 29/03/19 \\
+  2304 & 1728 & 80278 & 0.2017 & 557.1894 & 9m & 25/02/19 \\
+  2304 & 1728 & 104361 & 0.1364 & 604.3428 & 10m & 16/03/19 \\
+  2048 & 1536 & 49176 & 0.2928 & 707.3133 & 11m & 07/03/19 \\
+  2048 & 1536 & 70252 & 0.2023 & 576.9724 & 9m & 17/02/19 \\
+  2048 & 1536 & 91327 & 0.1344 & 401.3182 & 6m & 07/03/19 \\
+  1792 & 1344 & 42261 & 0.2865 & 616.2887 & 10m & 05/03/19 \\
+  1792 & 1344 & 60373 & 0.1963 & 492.1460 & 8m & 23/02/19 \\
+  1792 & 1344 & 78485 & 0.1383 & 654.3639 & 10m & 06/03/19 \\
+  1472 & 1104 & 33785 & 0.2788 & 933.6181 & 15m & 04/03/19 \\
+  1472 & 1104 & 48264 & 0.1953 & 598.9760 & 9m & 17/02/19 \\
+  1472 & 1104 & 62744 & 0.1301 & 638.6556 & 10m & 05/03/19 \\
+  1056 & 792 & 23111 & 0.2721 & 1126.238 & 18m & 03/03/19 \\
+  1056 & 792 & 33016 & 0.1809 & 575.5981 & 9m & 16/02/19 \\
+  1056 & 792 & 42921 & 0.1277 & 623.7723 & 10m & 04/03/19 \\
+  320 & 240 & 5777 & 0.2037 & 800.3702 & 13m & 03/03/19 \\
+  320 & 240 & 8253 & 0.1268 & 703.0797 & 11m & 16/02/19 \\
+  320 & 240 & 10728 & 0.0714 & 568.4690 & 9m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
+
+\newpage
+\item Classifier with $O(n)$ bits:
+  \begin{center}
+  \begin{tabular}{ c c c | c | c c c }
+  Width & Height & Bits & MinPE & Seconds & Approx. Time & Date Finished \\ \hline
+  3072 & 2304 & 110647 & 0.1960 & 838.7881 & 13m & 18/03/19 \\
+  3072 & 2304 & 158067 & 0.1170 & 579.8852 & 9m & 27/02/19 \\
+  3072 & 2304 & 205487 & 0.0714 & 328.6171 & 5m & 29/03/19 \\
+  2912 & 2184 & 99421 & 0.2099 & 512.1684 & 8m & 25/03/19 \\
+  2912 & 2184 & 142030 & 0.1233 & 507.3802 & 8m & 26/02/19 \\
+  2912 & 2184 & 184640 & 0.0727 & 441.9584 & 7m & 29/03/19 \\
+  2720 & 2040 & 86743 & 0.2234 & 331.2557 & 5m & 24/03/19 \\
+  2720 & 2040 & 123919 & 0.1367 & 605.8217 & 10m & 27/02/19 \\
+  2720 & 2040 & 161094 & 0.0841 & 490.3062 & 8m & 26/03/19 \\
+  2528 & 1896 & 74929 & 0.2439 & 446.1127 & 7m & 16/03/19 \\
+  2528 & 1896 & 107042 & 0.1551 & 356.6084 & 5m & 27/02/19 \\
+  2528 & 1896 & 139154 & 0.0930 & 530.5080 & 8m & 18/03/19 \\
+  2304 & 1728 & 62239 & 0.2667 & 653.6526 & 10m & 17/03/19 \\
+  2304 & 1728 & 88912 & 0.1729 & 593.4742 & 9m & 27/02/19 \\
+  2304 & 1728 & 115586 & 0.1118 & 601.5955 & 10m & 18/03/19 \\
+  2048 & 1536 & 49176 & 0.2928 & 707.3133 & 11m & 07/03/19 \\
+  2048 & 1536 & 70252 & 0.2023 & 576.9724 & 9m & 17/02/19 \\
+  2048 & 1536 & 91327 & 0.1344 & 401.3182 & 6m & 07/03/19 \\
+  1792 & 1344 & 37650 & 0.3137 & 622.1424 & 10m & 06/03/19 \\
+  1792 & 1344 & 53786 & 0.2252 & 557.5206 & 9m & 26/02/19 \\
+  1792 & 1344 & 69922 & 0.1650 & 711.2485 & 11m & 07/03/19 \\
+  1472 & 1104 & 25404 & 0.3385 & 503.1627 & 8m & 04/03/19 \\
+  1472 & 1104 & 36292 & 0.2655 & 568.3256 & 9m & 25/02/19 \\
+  1472 & 1104 & 47180 & 0.2003 & 737.7079 & 12m & 05/03/19 \\
+  1056 & 792 & 13074 & 0.3809 & 1114.103 & 18m & 04/03/19 \\
+  1056 & 792 & 18677 & 0.3237 & 473.9401 & 7m & 17/02/19 \\
+  1056 & 792 & 24281 & 0.2566 & 509.4404 & 8m & 05/03/19 \\
+  320 & 240 & 1200 & 0.4467 & 948.5706 & 15m & 03/03/19 \\
+  320 & 240 & 1715 & 0.4205 & 888.4257 & 14m & 06/02/19 \\
+  320 & 240 & 2229 & 0.3887 & 820.8869 & 13m & 03/03/19 \\
+  \end{tabular}
+  \end{center}
 \end{itemize}
 
 \end{document}
