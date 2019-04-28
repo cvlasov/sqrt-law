@@ -51,7 +51,7 @@ def handle_image(name, width, height):
 
   # Rotate the image to landscape, if necessary
   if width < height:
-    subprocess.call('jpegtran -rotate 90 {} > {}'.format( \
+    subprocess.call('jpegtran -trim -rotate 90 {} > {}'.format( \
                     output_path, temp_path), shell=True)
     temp = width
     width = height
@@ -80,7 +80,7 @@ def handle_image(name, width, height):
                                             int(width_diff/2),   \
                                             int(height_diff/2))
     # -trim argument removes edge pixels that make image odd-sized
-    subprocess.call('jpegtran -trim -crop {} {} > {}'.format( \
+    subprocess.call('jpegtran -perfect -trim -crop {} {} > {}'.format( \
                     crop_arg, temp_path, output_path), shell=True)
   else:
     # Skip image
