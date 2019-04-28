@@ -1,5 +1,7 @@
 \documentclass[11pt,a4paper,twoside,openright]{report}
 
+\usepackage{amsmath}
+\usepackage{cite}
 \usepackage{graphicx}
 \usepackage{hyperref}
 
@@ -15,27 +17,27 @@
 \begin{document}
 
 \makeatletter
-	\begin{titlepage}
-		\vspace*{\fill}
-		\begin{center}
-			{\huge \bfseries \@title }
-			\\[20ex]
-			\includegraphics[width=30mm]{oxlogo.png}
-			\\[10ex]
-			{\LARGE \@author}
-			\\[3ex]
-			{\Large University College}
-			\\[1ex]
-			{\Large University of Oxford}
-			\\[8ex]
-			{\Large Honour School of Computer Science}
-			\\[1ex]
-			{\Large \emph{Computer Science Project (Part C)}}
-			\\[10ex]
-			{\LARGE May 2019}
-		\end{center}
-		\vspace*{\fill}
-	\end{titlepage}
+  \begin{titlepage}
+    \vspace*{\fill}
+      \begin{center}
+        {\huge \bfseries \@title }
+        \\[20ex]
+        \includegraphics[width=30mm]{oxlogo.png}
+        \\[10ex]
+        {\LARGE \@author}
+        \\[3ex]
+        {\Large University College}
+        \\[1ex]
+        {\Large University of Oxford}
+        \\[8ex]
+        {\Large Honour School of Computer Science}
+        \\[1ex]
+        {\Large \emph{Computer Science Project (Part C)}}
+        \\[10ex]
+        {\LARGE May 2019}
+      \end{center}
+    \vspace*{\fill}
+  \end{titlepage}
 \makeatother
 
 
@@ -64,37 +66,98 @@ Abstract.
 \chapter{Introduction}
 
 \begin{itemize}
-    \item Steganography
-    \item Costs + features
-    \item ?
+  \item Steganography
+  \item Costs + features
+  \item ? \& ? (detectors)
 \end{itemize}
 
 %-----------------------
 \chapter{Hypothesis}
 
 \begin{itemize}
-    \item Square root law (point to 2008 paper, including graphs)
-    \item List of questions
+  \item Square root law (point to 2008 paper \cite{2008-paper}, including graphs)
+  \item List of questions
 \end{itemize}
 
 %-----------------------
 \chapter{Experimental Design}
 
-\begin{itemize}
-    \item Data
-    \item Embedding
-    \item Features
-    \item ?
-\end{itemize}
+All image sizes discussed are measured in pixels.
+
+\section{Data}
+
+% file size (MB)
+% du command at the end to see how much data was computed in total for the project
+
+\subsection{Image Source}
+The images used in this project were sourced from the Yahoo Flickr Creative Commons 100 Million Dataset (YFCC100M) \cite{yfcc100m}, which contains nearly 100 million images from many users. A user was selected so as to maximize the number of images taken with the same camera, with as many large images of the same size as possible. The user chosen for this project is called ``actor 3" and used a Panasonic DMC-TZ3 camera to take 13,349 images. The largest images taken by actor 3 are $3072 \times 2304$ and 9539 of the images are of this size. A file called \texttt{metadata.txt} for the actor was produced by Dr. Ker when downloading the images. It contains information about the actor (such as camera model) as well as about each image (such as image number, width, and height).
+
+\subsection{Selection}
+A script called \texttt{initial\_curation.py} was written to select the largest images and put them in a standard format. The script uses the metadata file to identify the images that are $3072\times2304$, makes all of these images grayscale, rotates the portrait ones to landscape, and places the resulting images in a new directory. The script took around 10 minutes to run and 9539 grayscale, $3072\times2304$, landscape images were produced.
+
+\subsection{Selecting Image Sizes}
+The primary goal of the experiments is to produce a graph plotting the image size in pixels against a classifier's accuracy. This involves running experiments on images of several different sizes, which will be produced by cropping the 9539 images of size $3072\times2304$. To best display the trends in the experiment results, ten image sizes had to be selected in such a way that the total numbers of pixels 
+
+The largest size is $3072\times2304$ since that is the largest size we have from \texttt{actor00003} and the smallest size was somewhat arbitrarily chosen to be $360\times240$. In the graphs with my experiment results, I will want the image sizes (specifically the total number of pixels) to be evenly distributed along the x-axis. In order to achieve this, I picked sizes such that the difference between the number of pixels in consecutive image sizes is roughly the same. I calculated this interval using:
+\begin{equation*}
+\frac{3072 \cdot 2304 - 320 \cdot 240}{9} \approx 777,899 \text{ pixels}
+\end{equation*}
+
+It is straightforward to compute the total number of pixels in the $n^{th}$ image size (where $320 \times 240$ is the $1^{st}$ size and $3072 \times 2304$ is the $10^{th}$ size):
+\begin{equation*}
+320 \cdot 240 + (n-1) \cdot 777,899
+\end{equation*}
+
+Given the desired number of pixels (call it $P$), we can find dimensions with a 4:3 ratio that produce approximately $P$ pixels. We do so by solving the following equation for $x$ and then computing $4x$ and $3x$ to get the dimensions:
+\begin{equation*}
+ P \approx 4x \cdot 3x = 12x^2
+ \end{equation*}
+
+The results of these computations are:
+\begin{center}
+\begin{tabular}{ c  c | c}
+Width & Height & Total pixels \\ \hline
+3072 & 2304 & 7,077,888 \\
+2912 & 2184 & 6,359,808 \\
+2720 & 2040 & 5,548,800 \\
+2528 & 1896 & 4,793,088 \\
+2304 & 1728 & 3,981,312 \\
+2048 & 1536 & 3,145,728 \\
+1792 & 1344 & 2,408,448 \\
+1472 & 1104 & 1,625,088 \\
+1056 & 792 & 836,352 \\
+320 & 240 & 76,800 \\
+\end{tabular}
+\end{center}
+
+
+\section{Embedding}
+
+% mention that ternary is better
+
+\section{Features}
+
+% mention how the features were checked with their sum being a constant
+
+\section{Costs}
+
 
 %-----------------------
 \chapter{Results \& Analysis}
 
+% total number of days/months/etc. of computing time for everything
+% split by question I'm answering, broken down by dataset
+% emphasize/bold the conclusion within each section
+
 \begin{itemize}
-    \item Tables/pictures/graphs
+  \item Tables \& pictures
 \end{itemize}
 
 %-----------------------
 \chapter{Conclusion}
+
+%-----------------------
+\bibliography{mybib}{}
+\bibliographystyle{plain}
 
 \end{document}
