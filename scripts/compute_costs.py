@@ -14,19 +14,20 @@ import time
 num_processes = 10
 
 def run(process_id):
-  for n in range(0,int(13350/num_processes)):
+  for n in range(0,int(13349/num_processes)+1):
     image_num = n * num_processes + process_id
-    image_partial_path = args.input_dir + 'image' + str(image_num).zfill(5)
-    if os.path.isfile(image_partial_path + '.jpg'):
+    image_path = args.input_dir + 'image' + str(image_num).zfill(5) + '.jpg'
+    cost_path = args.output_dir + '.costs'
+    if os.path.isfile(image_path) and not os.path.isfile(cost_path):
       # No -v because printing gets messed up with multiple processes running
-      subprocess.call('./J-UNIWARD-COSTS -i ' + image_partial_path + '.jpg'
-                      + ' -O ' + args.output_dir + ' -a 0.4', shell=True)
+      subprocess.call('./J-UNIWARD-COSTS -i ' + image_path + ' -O ' + \
+                      args.output_dir + ' -a 0.4', shell=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-I", "--input-dir", required=True,
-                    help="Directory with all images")
-parser.add_argument("-O", "--output-dir", required=True,
-                    help="Directory to save cost files")
+parser.add_argument('-I', '--input-dir', required=True,
+                    help='Directory with all images')
+parser.add_argument('-O', '--output-dir', required=True,
+                    help='Directory to save cost files')
 args = parser.parse_args()
 
 start = time.time()
