@@ -17,7 +17,7 @@ def run(process_id):
   for n in range(0,int(13349/num_processes)+1):
     image_num = n * num_processes + process_id
     image_path = args.input_dir + 'image' + str(image_num).zfill(5) + '.jpg'
-    cost_path = args.output_dir + '.costs'
+    cost_path = args.output_dir + 'image' + str(image_num).zfill(5) + '.costs'
     if os.path.isfile(image_path) and not os.path.isfile(cost_path):
       # No -v because printing gets messed up with multiple processes running
       subprocess.call('./J-UNIWARD-COSTS -i ' + image_path + ' -O ' + \
