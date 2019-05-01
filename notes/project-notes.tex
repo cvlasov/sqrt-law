@@ -4,6 +4,7 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{multirow}
 
 \graphicspath{{images/}}
 
@@ -77,6 +78,40 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 %-----------------------
 \chapter{Meeting Notes}
 
+\section{29/04/19}
+
+\begin{itemize}
+
+  \item What I did:
+    \begin{itemize}
+      \item Pre-processed and cropped the BOSSbase images, computed their features, and their costs are in the process of being computed.
+    \end{itemize}
+
+  \item Right-justify numbers and use ``\\," to insert a space between groups of three digits that is the width of a comma
+
+  \item I can use ``Imagemagick convert" to subtract a cover image from a stego image (command is \texttt{minus}).
+  \begin{itemize}
+      \item I can enhance the contrast to show more clearly which coefficients were changed.
+      \item I could include an example of a stego image that the classifier successfully detected and one that the classifier did not detect and the resulting image subtractions should show how many more changes were in the one that was detected.
+  \end{itemize}
+  
+  \item It would be cool to plot ROC curves from the classifier's results. I can extract the points on the curve from variables in the classifier code.
+  \begin{itemize}
+      \item Results.PFA = probability of false alarm
+      \item Results.PMD = probability of misdetection
+      \item ROC curve: PFA on the x-axis and 1 - PMD on the y-axis
+  \end{itemize}
+
+  \item On Tuesday we will discuss my drafts of sections 1 and 3 and prospectively discuss sections 2 and 4
+  
+  \item Footnotes are good for technical details (e.g. name and location of a script). I could make my GitHub repository public and include links directly to the relevant scripts.
+  
+  \item It is fine to write my report in the first-person rather than in the passive voice. I can use ``we" when drawing a conclusion (e.g. ``we can see that...").
+  
+  \item At the top of the Experimental Design chapter, I can mention that my supervisor provided me with the image sets and with the sped-up J-UNIWARD code for cost computation and say that I have highlighted them (e.g. in italics) in the places in my report where I mention/use them.
+
+\end{itemize}
+
 \section{Easter Break}
 
 \begin{itemize}
@@ -147,6 +182,21 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
     \end{itemize}
 
   \item My next set of experiments will be on BOSSbase.
+
+  \item I will crop the BOSSbase images to the following sizes:
+  \begin{center}
+  \begin{tabular}{ c c | c c }
+  Width & Height & Total pixels \\ \hline
+  896 & 672 & 602112 \\
+  1280 & 960 & 1228800 \\
+  1536 & 1152 & 1769472 \\
+  1792 & 1344 & 2408448 \\
+  2016 & 1512 & 3048192 \\
+  2172 & 1632 & 3544704 \\
+  2368 & 1776 & 4205568 \\
+  2560 & 1920 & 4915200 \\
+  \end{tabular}
+  \end{center}
 
 \end{itemize}
 
@@ -887,6 +937,11 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
   \item \texttt{./run\_abc\_xyz.sh /usr/local/matlab-r2014a/}
   \end{itemize}
 
+\item Delete all empty files (i.e. size 0) in the current directory:
+  \begin{itemize}
+  \item \texttt{find . -size 0 -delete}
+  \end{itemize}
+
 \end{itemize}
 
 
@@ -924,15 +979,17 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 
 
 %-----------------------
-\chapter{Actor3 Experiment Results}
+\chapter{Actor00003 Results}
 \label{sec:actor3-results}
 
 \section{Cover Images}
 \input{results/actor3_cover}
 
+\newpage
 \section{Ternary Embedding (\texorpdfstring{$\alpha=0.1$}{alpha})}
 \input{results/actor3_juni_01}
 
+\newpage
 \section{Ternary Embedding (other \texorpdfstring{$\alpha$}{alpha} values)}
 \input{results/actor3_juni_other}
 
@@ -946,10 +1003,37 @@ I wrote a script called \texttt{crop.py} to crop the original cover photos to th
 
 \newpage
 \section{\texorpdfstring{$O(\log{n} \cdot \sqrt{n})$}{O(log(n)*sqrt(n))} Binary Embedding}
-\input{results/actor3_bin_O(log_sqrt).tex}
+\input{results/actor3_bin_O(log_sqrt)}
 
 \newpage
 \section{\texorpdfstring{$O(n)$}{O(n)} Binary Embedding}
-\input{results/actor3_bin_O(n).tex}
+\input{results/actor3_bin_O(n)}
+
+
+%-----------------------
+\chapter{BOSSbase Results}
+
+\section{Cover Images}
+\input{results/bossbase_cover}
+
+\newpage
+\section{Binary Embedding to Pick Constants}
+\input{results/bossbase_bin_test}
+
+\newpage
+\section{\texorpdfstring{$O(1)$}{O(1)} Binary Embedding}
+\input{results/bossbase_bin_O(1)}
+
+\newpage
+\section{\texorpdfstring{$O(\sqrt{n})$}{O(sqrt(n))} Binary Embedding}
+\input{results/bossbase_bin_O(sqrt)}
+
+\newpage
+\section{\texorpdfstring{$O(\log{n} \cdot \sqrt{n})$}{O(log(n)*sqrt(n))} Binary Embedding}
+\input{results/bossbase_bin_O(log_sqrt)}
+
+\newpage
+\section{\texorpdfstring{$O(n)$}{O(n)} Binary Embedding}
+\input{results/bossbase_bin_O(n)}
 
 \end{document}

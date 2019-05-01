@@ -1,0 +1,76 @@
+\subsection{Pre-Processing}
+\begin{itemize}
+    \item 28/04/19: $1898.162047624588s \approx$ 31m38s
+\end{itemize}
+
+\subsection{Cropping}
+\begin{itemize}
+  \item 28/04/19:
+  \begin{center}
+  \begin{tabular}{ r r | r r }
+  Width & Height & Seconds & Time\\ \hline
+  896 & 672 & 670.6809992790222 & 11m10s \\
+  1280 & 960 & 869.6759219169617 & 14m29s \\
+  1536 & 1152 & 971.5487561225891 & 16m11s \\
+  1792 & 1344 & 1050.4921774864197 & 17m30s \\
+  2016 & 1512 & 1105.5677495002747 & 18m25s \\
+  2172 & 1632 & 1130.9943554401398 & 18m50s \\
+  2368 & 1776 & 1165.8989317417145 & 19m25s \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+
+\subsection{Costs}
+  \begin{center}
+  \begin{tabular}{ r r | r r r }
+  Width & Height & Seconds & Time & Date Finished \\ \hline
+  896 & 672 & - & - & 28/04/19 \\
+  1280 & 960 & - & - & 29/04/19 \\
+  1536 & 1152 & - & - & 30/04/19 \\
+  1792 & 1344 & - & - & 30/04/19 \\
+  2016 & 1512 & - & - & 30/04/19 \\
+  2172 & 1632 & - & - & 30/04/19 \\
+  2368 & 1776 & - & - & 30/04/19 \\
+  2560 & 1920 & - & - & 30/04/19 \\
+  \end{tabular}
+  \end{center}
+
+\subsection{Features}
+\begin{itemize}
+\item 28/04/19:
+  \begin{center}
+  \begin{tabular}{ r r | r r }
+  Width & Height & Seconds & Time \\ \hline
+  896 & 672 & 15185.12661 & 4h13m \\
+  1280 & 960 & 28070.6334596 & 7h47m \\
+  1536 & 1152 & 37598.4753635 & 10h26m \\
+  1792 & 1344 & 47635.9970586 & 13h13m \\
+  2016 & 1512 & 54723.5426657 & 15h12m \\
+  2172 & 1632 & 60593.4311967 & 16h49m \\
+  2368 & 1776 & 70952.7664742 & 19h42m \\
+  2560 & 1920 & 82410.7037129 & 22h53m \\
+  \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item I ran a sanity check on the features to verify that the sums of the features for each size are 1346.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Feature Matrix}
+\begin{itemize}
+\item 29/04/19 - Combine feature files:
+    \begin{center}
+    \begin{tabular}{ r r | r r }
+    Width & Height & Seconds & Time \\ \hline
+    896 & 672 & 1643.2899618148804 & 27m23s \\
+    1280 & 960 & 1746.618369102478 & 29m6s \\
+    1536 & 1152 & 1731.4882395267487 & 28m51s \\
+    1792 & 1344 & 1711.701896429062 & 28m31s \\
+    2016 & 1512 & 1767.2302868366241 & 29m27s \\
+    2172 & 1632 & 1752.680210351944 & 29m12s \\
+    2368 & 1776 & 1735.4187836647034 & 28m55s \\
+    2560 & 1920 & 1757.0920870304108 & 29m17s \\
+    \end{tabular}
+    \end{center}
+  \item 30/04/19 - Convert to MATLAB matrix (no timing information)
+\end{itemize}

@@ -1,10 +1,7 @@
 \subsection{Embedding}
-\begin{itemize}
-  \item Sizes $1792 \times 1344, 2048 \times 1536, and 2304 \times 1728$ didn't terminate properly when they were first run. The processes ran for over ten days and were making progress but would randomly stall at various times, sometimes for 30 minutes, sometimes for 6 hours. So, the processes were killed, the script was adapted so that it would only embed in the cover images that did not already have corresponding stego images, and it was rerun for those three sizes.
-  \item Since the first run had to be terminated prematurely and the standard output produced by the second run was lost, there is no timing information for these three sizes.
   \begin{center}
-  \begin{tabular}{ c c | c c c }
-  Width & Height & Seconds & Approx. Time & Date Finished \\ \hline
+  \begin{tabular}{ r r | r r r }
+  Width & Height & Seconds & Time & Date Finished \\ \hline
   2304 & 1728 & -- & -- & 13/12/18 \\
   2048 & 1536 & -- & -- & 12/12/18 \\
   1792 & 1344 & -- & -- & 12/12/18 \\
@@ -13,12 +10,11 @@
   320 & 240 & 3192.98 & 53m & 29/11/18 \\
   \end{tabular}
   \end{center}
-\end{itemize}
 
 \subsection{Features}
   \begin{center}
-  \begin{tabular}{ c c | c c c }
-  Width & Height & Seconds & Approx. Time & Date \\ \hline
+  \begin{tabular}{ r r | r r r }
+  Width & Height & Seconds & Time & Date \\ \hline
   2304 & 1728 & 13062.3725212 & 3h37m & 13/12/18 \\
   2048 & 1536 & 12428.002079 & 3h27m & 13/12/18 \\
   1792 & 1344 & 8581.41911697 & 2h23m & 12/12/18 \\
@@ -32,8 +28,8 @@
 \begin{itemize}
   \item Combine feature files:
   \begin{center}
-  \begin{tabular}{ c c | c c c }
-  Width & Height & Seconds & Approx. Time & Date \\ \hline
+  \begin{tabular}{ r r | r r r }
+  Width & Height & Seconds & Time & Date \\ \hline
   2304 & 1728 & 39.6396141052 & 39s & 13/12/18 \\
   2048 & 1536 & 40.74949193 & 40s & 13/12/18 \\
   1792 & 1344 & 80.3196239471 & 1m20s & 13/12/18 \\
@@ -48,8 +44,8 @@
 
 \subsection{Linear Classifier}
   \begin{center}
-  \begin{tabular}{ c c | c | c c c }
-  Width & Height & MinPE & Seconds & Approx. Time & Date \\ \hline
+  \begin{tabular}{ r r | r | r r r }
+  Width & Height & MinPE & Seconds & Time & Date \\ \hline
   2304 & 1728 & 0.3743 & 436.3494 & 7m & 13/12/18 \\
   2048 & 1536 & 0.3809 & 491.4821 & 8m & 13/12/18 \\
   1792 & 1344 & 0.3981 & 375.6563 & 6m & 13/12/18 \\
