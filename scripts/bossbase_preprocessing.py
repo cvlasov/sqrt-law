@@ -71,26 +71,31 @@ def handle_image(name, width, height):
     width_diff = width_after_trim - args.cropped_width
     height_diff = height_after_trim - args.cropped_height
 
+    # Coordinates where cropping should start.
+    start_x = int(width_diff/2) - (int(width_diff/2) % 8)
+    start_y = int(height_diff/2) - (int(height_diff/2) % 8)
+
     # Crop 32 pixels from each side (i.e. center crop)
     # The jpegtran -crop argument is of the form WxH+X+Y where W and H are the
     # width and height to crop to, respectively, and (X,Y) is the starting
     # point for cropping.
     crop_arg = '{:d}x{:d}+{:d}+{:d}'.format(args.cropped_width,  \
                                             args.cropped_height, \
-                                            int(width_diff/2),   \
-                                            int(height_diff/2))
+                                            start_x,             \
+                                            start_y)
+
     # -trim argument removes edge pixels that make image odd-sized
     subprocess.call('jpegtran -perfect -trim -crop {} {} > {}'.format( \
                     crop_arg, temp_path, output_path), shell=True)
   else:
     # Skip image
-    print('{} is too small. Skipping.'.format(name))
+    print('File {} is too small. Skipping.'.format(input_path))
     os.remove(output_path)
 
   # Remove the temporary file
   os.remove(temp_path)
 
-  print('Done processing {}.'.format(name))
+  print('Done processing {}.'.format(input_path))
 
 # --------------
 # SCRIPT
