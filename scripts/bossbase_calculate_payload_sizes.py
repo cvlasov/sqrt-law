@@ -18,7 +18,7 @@ import time
 from math import log,sqrt
 
 sizes = [(896,672), (1280,960), (1536,1152), (1792,1344), (2016,1512),
-         (2172,1632), (2368,1776), (2560,1920)]
+         (2176,1632), (2368,1776), (2560,1920)]
 
 # Binary J-UNIWARD embedding with a payload of 41287 bits in 1792x1344 images
 # produced a MinPE value of around 0.2028 so those results are used to compute
