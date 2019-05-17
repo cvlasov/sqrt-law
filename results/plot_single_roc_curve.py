@@ -28,8 +28,8 @@ with open(roc_points_filename, 'r') as roc_points_file:
 
 # Create plot
 plt.figure(figsize=(7,7))
-plt.xlabel(r'$P_{FA}$')
-plt.ylabel(r'$1-P_{MD}$')
+plt.xlabel(r'$f_p$')
+plt.ylabel(r'$1-f_n$')
 
 # Plot ROC curve
 plt.plot(x, y, color='r')

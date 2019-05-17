@@ -67,8 +67,8 @@ for i in range(0, num_sizes):
 # Plot ROC curve of a random classifier for reference
 plt.plot([0.0,1.0], [0.0,1.0], color='#696969', linestyle='dashed')
 
-plt.xlabel(r'$P_{FA}$')
-plt.ylabel(r'$1-P_{MD}$')
+plt.xlabel(r'$f_p$')
+plt.ylabel(r'$1-f_n$')
 if args.with_title:
     plt.title(graph_title)
 plt.legend(loc='lower right')
