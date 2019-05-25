@@ -45,50 +45,62 @@ if args.rate == 0:  # Plot all four payload rates
 
     # Constant payload
     plt.subplot(2,2,1)
-    plt.plot(x, y1_s, 'r+:', label=r'0.7$r_1$')
-    plt.plot(x, y1_m, 'bs:', label=r'$r_1$')
-    plt.plot(x, y1_l, 'go:', label=r'1.3$r_1$')
+    plt.plot(x[0], y1_s[0], 'r+')
+    plt.plot(x[0], y1_m[0], 'bs')
+    plt.plot(x[0], y1_l[0], 'go')
+    plt.plot(x[1:], y1_s[1:], 'r+:', label=r'$m\ =\ 0.7\ r_1$')
+    plt.plot(x[1:], y1_m[1:], 'bs:', label=r'$m\ =\ r_1$')
+    plt.plot(x[1:], y1_l[1:], 'go:', label=r'$m\ =\ 1.3\ r_1$')
     plt.axis(axis_bounds)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     if args.with_title:
-        plt.title(r'Constant payload')
+        plt.title(r'$O(1)$ payload')
     plt.legend(loc='upper right')
 
     # Payload proportional to sqrt(N)
     plt.subplot(2,2,2)
-    plt.plot(x, y2_s, 'r+:', label=r'0.7$r_2$')
-    plt.plot(x, y2_m, 'bs:', label=r'$r_2$')
-    plt.plot(x, y2_l, 'go:', label=r'1.3$r_2$')
+    plt.plot(x[0], y2_s[0], 'r+')
+    plt.plot(x[0], y2_m[0], 'bs')
+    plt.plot(x[0], y2_l[0], 'go')
+    plt.plot(x[1:], y2_s[1:], 'r+:', label=r'$m\ =\ 0.7\ r_2\ \sqrt{N}$')
+    plt.plot(x[1:], y2_m[1:], 'bs:', label=r'$m\ =\ r_2\ \sqrt{N}$')
+    plt.plot(x[1:], y2_l[1:], 'go:', label=r'$m\ =\ 1.3\ r_2\ \sqrt{N}$')
     plt.axis(axis_bounds)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     if args.with_title:
-        plt.title(r'Payload $\propto \sqrt{N}$')
+        plt.title(r'$O(\sqrt{N})$ payload')
     plt.legend(loc='lower right')
 
     # Payload proportional to sqrt(N) * log(N)
     plt.subplot(2,2,3)
-    plt.plot(x, y3_s, 'r+:', label=r'0.7$r_3$')
-    plt.plot(x, y3_m, 'bs:', label=r'$r_3$')
-    plt.plot(x, y3_l, 'go:', label=r'1.3$r_3$')
+    plt.plot(x[0], y3_s[0], 'r+')
+    plt.plot(x[0], y3_m[0], 'bs')
+    plt.plot(x[0], y3_l[0], 'go')
+    plt.plot(x[1:], y3_s[1:], 'r+:', label=r'$m\ =\ 0.7\ r_3\ \sqrt{N}\ \log{N}$')
+    plt.plot(x[1:], y3_m[1:], 'bs:', label=r'$m\ =\ r_3\ \sqrt{N}\ \log{N}$')
+    plt.plot(x[1:], y3_l[1:], 'go:', label=r'$m\ =\ 1.3\ r_3\ \sqrt{N}\ \log{N}$')
     plt.axis(axis_bounds)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     if args.with_title:
-        plt.title(r'Payload $\propto \sqrt{N} \cdot \log{N}$')
+        plt.title(r'$O(\sqrt{N}\ \log{N})$ payload')
     plt.legend(loc='lower right')
 
     # Payload proportional to N
     plt.subplot(2,2,4)
-    plt.plot(x, y4_s, 'r+:', label=r'0.7$r_4$')
-    plt.plot(x, y4_m, 'bs:', label=r'$r_4$')
-    plt.plot(x, y4_l, 'go:', label=r'1.3$r_4$')
+    plt.plot(x[0], y4_s[0], 'r+')
+    plt.plot(x[0], y4_m[0], 'bs')
+    plt.plot(x[0], y4_l[0], 'go')
+    plt.plot(x[1:], y4_s[1:], 'r+:', label=r'$m\ =\ 0.7\ r_4\ N$')
+    plt.plot(x[1:], y4_m[1:], 'bs:', label=r'$m\ =\ r_4\ N$')
+    plt.plot(x[1:], y4_l[1:], 'go:', label=r'$m\ =\ 1.3\ r_4\ N$')
     plt.axis(axis_bounds)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     if args.with_title:
-        plt.title(r'Payload $\propto N$')
+        plt.title(r'$O(N)$ payload')
     plt.legend(loc='lower right')
 
     # Save plot
@@ -101,47 +113,55 @@ else:
     y_small = []
     y_med = []
     y_large = []
-    constant_name = ''
+    constant = ''
     legend_location = ''
+    rate = ''
 
     if args.rate == 1:  # Constant payload
         y_small = y1_s
         y_med = y1_m
         y_large = y1_l
-        graph_title = r'Constant payload'
+        graph_title = r'$O(1)$ payload'
         file_desc = 'constant'
-        constant_name = r'$r_1$'
+        constant = r'$r_1$'
         legend_location = 'upper right'
+        rate = ''
     elif args.rate == 2:  # Payload proportional to sqrt(N)
         y_small = y2_s
         y_med = y2_m
         y_large = y2_l
-        graph_title = r'Payload $\propto \sqrt{N}$'
+        graph_title = r'$O(\sqrt{N})$ payload'
         file_desc = 'sqrt'
-        constant_name = r'$r_2$'
+        constant = r'$r_2$'
         legend_location = 'lower right'
+        rate = r'$\sqrt{N}$'
     elif args.rate == 3:  # Payload proportional to sqrt(N) * log(N)
         y_small = y3_s
         y_med = y3_m
         y_large = y3_l
-        graph_title = r'Payload $\propto \sqrt{N} \cdot \log{N}$'
+        graph_title = r'$O(\sqrt{N}\ \log{N})$ payload'
         file_desc = 'sqrt_log'
-        constant_name = r'$r_3$'
+        constant = r'$r_3$'
         legend_location = 'lower right'
+        rate = r'$\sqrt{N}\ \log{N}$'
     else:  # Payload proportional to N
         y_small = y4_s
         y_med = y4_m
         y_large = y4_l
-        graph_title = r'Payload $\propto N$'
+        graph_title = r'$O(N)$ payload'
         file_desc = 'linear'
-        constant_name = r'$r_4$'
+        constant = r'$r_4$'
         legend_location = 'lower right'
+        rate = r'$N$'
 
     # Create plot
     plt.figure(figsize=(6,5))
-    plt.plot(x, y_small, 'r+:', label='0.7{}'.format(constant_name))
-    plt.plot(x, y_med, 'bs:', label=constant_name)
-    plt.plot(x, y_large, 'go:', label='1.3{}'.format(constant_name))
+    plt.plot(x[0], y_small[0], 'r+')
+    plt.plot(x[0], y_med[0], 'bs')
+    plt.plot(x[0], y_large[0], 'go')
+    plt.plot(x[1:], y_small[1:], 'r+:', label=r'$m\ =\ 0.7\ ${}{}'.format(constant, rate))
+    plt.plot(x[1:], y_med[1:], 'bs:', label=r'$m\ =\ ${}{}'.format(constant, rate))
+    plt.plot(x[1:], y_large[1:], 'go:', label=r'$m\ =\ 1.3\ ${}{}'.format(constant, rate))
     plt.axis(axis_bounds)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
